@@ -11,9 +11,10 @@ export const initSentry = () => {
     environment: __DEV__ ? 'development' : 'production',
     release: '1.0.0', // Versión de la app
     
-    // Configuración de muestreo
+    // Configuración de tracing
     tracesSampleRate: __DEV__ ? 1.0 : 0.2,
     profilesSampleRate: __DEV__ ? 1.0 : 0.1,
+    enableTracing: true,
     
     // Configuración de breadcrumbs
     enableAutoSessionTracking: true,
@@ -23,8 +24,8 @@ export const initSentry = () => {
     beforeSend(event) {
       // Filtrar eventos sensibles
       if (event.request?.headers) {
-        delete event.request.headers['authorization'];
-        delete event.request.headers['Authorization'];
+        delete event.request.headers.authorization;
+        delete event.request.headers.Authorization;
       }
       return event;
     },
@@ -34,6 +35,12 @@ export const initSentry = () => {
       new Sentry.ReactNativeTracing({
         tracingOrigins: ['localhost', 'your-api-domain.com'],
         routingInstrumentation: Sentry.routingInstrumentation,
+        // Configuración específica de tracing
+        idleTimeout: 5000, // Timeout para transacciones inactivas
+        maxTransactionDuration: 30000, // Duración máxima de transacciones
+        startTransactionOnLocationChange: true, // Iniciar transacciones en cambios de ubicación
+        startTransactionOnPageLoad: true, // Iniciar transacciones en carga de página
+        startTransactionOnAppStart: true, // Iniciar transacciones al iniciar la app
       }),
     ],
     
@@ -137,6 +144,7 @@ export const defaultSentryConfig = {
   debug: __DEV__,
   tracesSampleRate: __DEV__ ? 1.0 : 0.2,
   profilesSampleRate: __DEV__ ? 1.0 : 0.1,
+  enableTracing: true,
   enableAutoSessionTracking: true,
   attachStacktrace: true,
 };
