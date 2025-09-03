@@ -213,3 +213,4 @@ export type LocationIconType = keyof typeof LocationIcons;
 export type TimeIconType = keyof typeof TimeIcons;
 export type StatusIconType = keyof typeof StatusIcons;
 export type ConfigIconType = keyof typeof ConfigIcons;
+

@@ -507,3 +507,4 @@ Ver `src/components/IconShowcase.tsx` para un ejemplo completo de todos los tipo
 4. **Optimizar rendimiento** con memoización
 5. **Implementar tests** para los iconos
 6. **Crear un catálogo visual** de iconos
+
