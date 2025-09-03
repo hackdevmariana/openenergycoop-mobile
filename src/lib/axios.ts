@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { Platform } from 'react-native';
+import { secureStore } from './secureStore';
 
 // Configuración base de la API
 const API_BASE_URL = __DEV__ 
@@ -34,7 +35,7 @@ const apiClient: AxiosInstance = axios.create({
 
 // Interceptor de requests
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig) => {
     // Log de requests en desarrollo
     if (__DEV__) {
       console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
@@ -44,7 +45,7 @@ apiClient.interceptors.request.use(
     }
 
     // Agregar token de autenticación si existe
-    const token = getAuthToken(); // Implementar esta función según tu sistema de auth
+    const token = await secureStore.getAuthToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -71,7 +72,7 @@ apiClient.interceptors.response.use(
     // Manejar respuestas exitosas
     return response;
   },
-  (error: AxiosError<ApiError>) => {
+  async (error: AxiosError<ApiError>) => {
     // Log de errores en desarrollo
     if (__DEV__) {
       console.error('❌ API Error:', {
@@ -88,7 +89,7 @@ apiClient.interceptors.response.use(
       switch (status) {
         case 401:
           // Token expirado o inválido
-          handleUnauthorized();
+          await handleUnauthorized();
           break;
         case 403:
           // Acceso denegado
@@ -123,11 +124,15 @@ apiClient.interceptors.response.use(
 );
 
 // Funciones de manejo de errores
-function handleUnauthorized(): void {
+async function handleUnauthorized(): Promise<void> {
   // Implementar lógica para manejar token expirado
-  // Por ejemplo: redirigir al login, limpiar token, etc.
   console.warn('🔐 Unauthorized: Token expirado o inválido');
-  // clearAuthToken();
+  
+  // Limpiar tokens de autenticación
+  await secureStore.clearAuth();
+  
+  // Aquí podrías implementar la lógica para redirigir al login
+  // Por ejemplo, usando un sistema de navegación global
   // redirectToLogin();
 }
 
@@ -164,27 +169,6 @@ function handleNetworkError(_error: AxiosError): void {
 function handleRequestError(_error: AxiosError): void {
   console.error('⚙️ Request Error: Error en la configuración de la request');
   // Mostrar mensaje de error de configuración
-}
-
-// Función para obtener token de autenticación
-function getAuthToken(): string | null {
-  // Implementar según tu sistema de autenticación
-  // Por ejemplo: AsyncStorage, SecureStore, etc.
-  return null;
-}
-
-// Función para limpiar token de autenticación
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function clearAuthToken(): void {
-  // Implementar según tu sistema de autenticación
-  console.log('🧹 Clearing auth token');
-}
-
-// Función para redirigir al login
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function redirectToLogin(): void {
-  // Implementar según tu sistema de navegación
-  console.log('🔀 Redirecting to login');
 }
 
 // Exportar instancia configurada
