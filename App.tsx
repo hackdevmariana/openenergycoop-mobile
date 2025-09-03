@@ -15,13 +15,25 @@ import {
 import { QueryProvider } from './src/providers/QueryProvider';
 import { PaperProvider } from './src/providers/PaperProvider';
 import AppNavigator from './src/navigation/AppNavigator';
+import SentryErrorBoundary from './src/components/SentryErrorBoundary';
 import { initializeStorage, verifyStorageIntegrity } from './src/services/storageInit';
+import { initSentry } from './src/config/sentry';
 import { useAppStore } from './src/stores/appStore';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
   const [isStorageReady, setIsStorageReady] = useState(false);
   const { loadFromStorage, setInitialized } = useAppStore();
+
+  // Inicializar Sentry al inicio de la aplicación
+  useEffect(() => {
+    try {
+      initSentry();
+      console.log('✅ Sentry inicializado correctamente');
+    } catch (error) {
+      console.error('❌ Error inicializando Sentry:', error);
+    }
+  }, []);
 
   // Inicializar AsyncStorage al inicio de la aplicación
   useEffect(() => {
@@ -58,14 +70,16 @@ function App() {
   }, [loadFromStorage, setInitialized]);
 
   return (
-    <QueryProvider>
-      <PaperProvider>
-        <SafeAreaProvider>
-          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-          <AppContent isReady={isStorageReady} />
-        </SafeAreaProvider>
-      </PaperProvider>
-    </QueryProvider>
+    <SentryErrorBoundary>
+      <QueryProvider>
+        <PaperProvider>
+          <SafeAreaProvider>
+            <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+            <AppContent isReady={isStorageReady} />
+          </SafeAreaProvider>
+        </PaperProvider>
+      </QueryProvider>
+    </SentryErrorBoundary>
   );
 }
 
