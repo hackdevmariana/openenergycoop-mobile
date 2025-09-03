@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useUsers, useDeleteUser } from '../hooks/useUsers';
-import { User } from '../services/api';
+import { User } from '../services/apiClient';
 
 interface UsersListProps {
   onUserPress?: (user: User) => void;
@@ -76,7 +76,7 @@ export const UsersList: React.FC<UsersListProps> = ({ onUserPress }) => {
     );
   }
 
-  if (!users || users.length === 0) {
+  if (!users || users.data.length === 0) {
     return (
       <View style={styles.centerContainer}>
         <Text style={styles.emptyText}>No hay usuarios disponibles</Text>
@@ -86,7 +86,7 @@ export const UsersList: React.FC<UsersListProps> = ({ onUserPress }) => {
 
   return (
     <FlatList
-      data={users}
+      data={users.data}
       renderItem={renderUserItem}
       keyExtractor={(item) => item.id}
       style={styles.container}

@@ -21,6 +21,8 @@ export function useApiQuery<T>(
     enabled?: boolean;
     staleTime?: number;
     gcTime?: number;
+    retry?: number;
+    retryDelay?: number;
   }
 ) {
   return useQuery({
