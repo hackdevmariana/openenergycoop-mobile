@@ -12,16 +12,19 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { QueryProvider } from './src/providers/QueryProvider';
+import { PaperProvider } from './src/providers/PaperProvider';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
     <QueryProvider>
-      <SafeAreaProvider>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <AppContent />
-      </SafeAreaProvider>
+      <PaperProvider>
+        <SafeAreaProvider>
+          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+          <AppContent />
+        </SafeAreaProvider>
+      </PaperProvider>
     </QueryProvider>
   );
 }

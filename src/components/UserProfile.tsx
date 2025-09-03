@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
-  TextInput,
   Alert,
   ScrollView,
-  ActivityIndicator,
 } from 'react-native';
+import { 
+  Button, 
+  Card, 
+  TextInput,
+  Text,
+  Avatar,
+  Divider,
+  ActivityIndicator,
+  Surface,
+} from 'react-native-paper';
 import { useAuthWithStore } from '../hooks/useAuthWithStore';
 import { useAppStore } from '../stores/appStore';
 import { useUpdateUser } from '../hooks/useUsers';
@@ -96,7 +102,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onLogout }) => {
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" />
         <Text style={styles.loadingText}>Cargando perfil...</Text>
       </View>
     );
@@ -112,112 +118,127 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onLogout }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Perfil de Usuario</Text>
-        <Text style={styles.subtitle}>Gestiona tu información personal</Text>
-      </View>
+      <Surface style={styles.header} elevation={1}>
+        <Text variant="headlineLarge" style={styles.title}>Perfil de Usuario</Text>
+        <Text variant="bodyLarge" style={styles.subtitle}>Gestiona tu información personal</Text>
+      </Surface>
 
       <View style={styles.profileSection}>
-        <View style={styles.avatarContainer}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {user.name.charAt(0).toUpperCase()}
-            </Text>
-          </View>
-          <Text style={styles.userName}>{user.name}</Text>
-          <Text style={styles.userRole}>{user.role}</Text>
-        </View>
+        <Card style={styles.card}>
+          <Card.Content>
+            <View style={styles.avatarContainer}>
+              <Avatar.Text 
+                size={80} 
+                label={user.name.charAt(0).toUpperCase()} 
+                style={styles.avatar}
+              />
+              <Text variant="headlineSmall" style={styles.userName}>{user.name}</Text>
+              <Text variant="bodyMedium" style={styles.userRole}>Rol: {user.role}</Text>
+            </View>
+          </Card.Content>
+        </Card>
 
-        <View style={styles.infoSection}>
-          <Text style={styles.sectionTitle}>Información Personal</Text>
-          
-          {isEditing ? (
-            <View style={styles.editForm}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Nombre</Text>
+        <Card style={styles.card}>
+          <Card.Content>
+            <Text variant="titleLarge" style={styles.sectionTitle}>Información Personal</Text>
+            <Divider style={styles.divider} />
+            {isEditing ? (
+              <View style={styles.editForm}>
                 <TextInput
-                  style={styles.input}
+                  label="Nombre"
                   value={editForm.name}
                   onChangeText={(text) => setEditForm(prev => ({ ...prev, name: text }))}
                   placeholder="Tu nombre"
-                />
-              </View>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email</Text>
-                <TextInput
                   style={styles.input}
+                />
+                
+                <TextInput
+                  label="Email"
                   value={editForm.email}
                   onChangeText={(text) => setEditForm(prev => ({ ...prev, email: text }))}
                   placeholder="Tu email"
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  style={styles.input}
                 />
-              </View>
 
-              <View style={styles.editButtons}>
-                <TouchableOpacity
-                  style={[styles.button, styles.cancelButton]}
-                  onPress={handleCancelEdit}
-                >
-                  <Text style={styles.cancelButtonText}>Cancelar</Text>
-                </TouchableOpacity>
+                <View style={styles.buttonRow}>
+                  <Button 
+                    mode="outlined" 
+                    onPress={handleCancelEdit}
+                    style={styles.actionButton}
+                  >
+                    Cancelar
+                  </Button>
+                  
+                  <Button 
+                    mode="contained" 
+                    onPress={handleSaveProfile}
+                    disabled={updateUserMutation.isPending}
+                    loading={updateUserMutation.isPending}
+                    style={styles.actionButton}
+                  >
+                    Guardar
+                  </Button>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.infoDisplay}>
+                <View style={styles.infoRow}>
+                  <Text variant="bodyMedium" style={styles.infoLabel}>Nombre:</Text>
+                  <Text variant="bodyLarge" style={styles.infoValue}>{user.name}</Text>
+                </View>
                 
-                <TouchableOpacity
-                  style={[styles.button, styles.saveButton]}
-                  onPress={handleSaveProfile}
-                  disabled={updateUserMutation.isPending}
+                <Divider style={styles.divider} />
+                
+                <View style={styles.infoRow}>
+                  <Text variant="bodyMedium" style={styles.infoLabel}>Email:</Text>
+                  <Text variant="bodyLarge" style={styles.infoValue}>{user.email}</Text>
+                </View>
+                
+                <Divider style={styles.divider} />
+                
+                <View style={styles.infoRow}>
+                  <Text variant="bodyMedium" style={styles.infoLabel}>Rol:</Text>
+                  <Text variant="bodyLarge" style={styles.infoValue}>{user.role}</Text>
+                </View>
+                
+                <Divider style={styles.divider} />
+                
+                <View style={styles.infoRow}>
+                  <Text variant="bodyMedium" style={styles.infoLabel}>Miembro desde:</Text>
+                  <Text variant="bodyLarge" style={styles.infoValue}>
+                    {new Date(user.createdAt).toLocaleDateString('es-ES')}
+                  </Text>
+                </View>
+
+                <Button 
+                  mode="contained" 
+                  onPress={() => setIsEditing(true)}
+                  style={styles.editButton}
                 >
-                  {updateUserMutation.isPending ? (
-                    <ActivityIndicator size="small" color="white" />
-                  ) : (
-                    <Text style={styles.saveButtonText}>Guardar</Text>
-                  )}
-                </TouchableOpacity>
+                  Editar Perfil
+                </Button>
               </View>
-            </View>
-          ) : (
-            <View style={styles.infoDisplay}>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Nombre:</Text>
-                <Text style={styles.infoValue}>{user.name}</Text>
-              </View>
-              
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Email:</Text>
-                <Text style={styles.infoValue}>{user.email}</Text>
-              </View>
-              
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Rol:</Text>
-                <Text style={styles.infoValue}>{user.role}</Text>
-              </View>
-              
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Miembro desde:</Text>
-                <Text style={styles.infoValue}>
-                  {new Date(user.createdAt).toLocaleDateString('es-ES')}
-                </Text>
-              </View>
+            )}
+          </Card.Content>
+        </Card>
 
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => setIsEditing(true)}
-              >
-                <Text style={styles.editButtonText}>Editar Perfil</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.actionsSection}>
-          <TouchableOpacity
-            style={styles.logoutButton}
-            onPress={handleLogout}
-          >
-            <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
-          </TouchableOpacity>
-        </View>
+        <Card style={styles.card}>
+          <Card.Content>
+            <Text variant="titleLarge" style={styles.sectionTitle}>Acciones</Text>
+            <Divider style={styles.divider} />
+            <Button 
+              mode="contained" 
+              onPress={handleLogout}
+              buttonColor="#FF3B30"
+              textColor="white"
+              style={styles.logoutButton}
+            >
+              Cerrar Sesión
+            </Button>
+          </Card.Content>
+        </Card>
       </View>
     </ScrollView>
   );
@@ -236,156 +257,72 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
+    marginBottom: 16,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1C1C1E',
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#8E8E93',
+    opacity: 0.7,
   },
   profileSection: {
-    padding: 20,
+    padding: 16,
+  },
+  card: {
+    marginBottom: 16,
   },
   avatarContainer: {
     alignItems: 'center',
-    marginBottom: 30,
+    paddingVertical: 20,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: 12,
   },
-  avatarText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: 'white',
-  },
   userName: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#1C1C1E',
     marginBottom: 4,
   },
   userRole: {
-    fontSize: 16,
-    color: '#8E8E93',
-    textTransform: 'capitalize',
-  },
-  infoSection: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
+    opacity: 0.7,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1C1C1E',
     marginBottom: 16,
   },
-  infoDisplay: {
+  divider: {
+    marginVertical: 16,
+  },
+  editForm: {
+    gap: 16,
+  },
+  input: {
+    marginBottom: 12,
+  },
+  buttonRow: {
+    flexDirection: 'row',
     gap: 12,
+    marginTop: 8,
+  },
+  actionButton: {
+    flex: 1,
+  },
+  infoDisplay: {
+    gap: 16,
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F7',
   },
   infoLabel: {
-    fontSize: 16,
-    color: '#8E8E93',
-    fontWeight: '500',
+    opacity: 0.7,
   },
   infoValue: {
-    fontSize: 16,
-    color: '#1C1C1E',
-    fontWeight: '600',
-  },
-  editForm: {
-    gap: 16,
-  },
-  inputGroup: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1C1C1E',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: 'white',
-  },
-  editButtons: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 8,
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: '#F2F2F7',
-  },
-  cancelButtonText: {
-    color: '#8E8E93',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  saveButton: {
-    backgroundColor: '#007AFF',
-  },
-  saveButtonText: {
-    color: 'white',
-    fontSize: 16,
     fontWeight: '600',
   },
   editButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
     marginTop: 16,
   },
-  editButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  actionsSection: {
-    gap: 12,
-  },
   logoutButton: {
-    backgroundColor: '#FF3B30',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  logoutButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
+    marginTop: 8,
   },
   loadingText: {
     marginTop: 10,
