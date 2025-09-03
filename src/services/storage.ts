@@ -274,20 +274,19 @@ class StorageService {
   /**
    * Limpiar elementos expirados
    */
-  async clearExpiredItems(maxAge: number): Promise<void> {
+  async clearExpiredItems(_maxAge: number): Promise<void> {
     try {
       const keys = await this.getAllKeys();
-      const expiredKeys: string[] = [];
+      const now = Date.now();
       
       for (const key of keys) {
-        const isExpired = await this.isItemExpired(key, maxAge);
-        if (isExpired) {
-          expiredKeys.push(key);
+        const itemString = await AsyncStorage.getItem(key);
+        if (itemString) {
+          const item: StorageItem = JSON.parse(itemString);
+          if (item.expiresAt && now > item.expiresAt) {
+            await this.removeItem(key);
+          }
         }
-      }
-      
-      if (expiredKeys.length > 0) {
-        await this.removeMultipleItems(expiredKeys);
       }
     } catch (error) {
       console.error('Error clearing expired items:', error);

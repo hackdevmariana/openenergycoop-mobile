@@ -14,7 +14,7 @@ import {
 } from 'react-native-safe-area-context';
 import { QueryProvider } from './src/providers/QueryProvider';
 import { PaperProvider } from './src/providers/PaperProvider';
-import StorageDemo from './src/components/StorageDemo';
+import AppNavigator from './src/navigation/AppNavigator';
 import { initializeStorage, verifyStorageIntegrity } from './src/services/storageInit';
 import { useAppStore } from './src/stores/appStore';
 
@@ -74,7 +74,7 @@ function AppContent({ isReady }: { isReady: boolean }) {
     return null; // O un componente de carga
   }
   
-  return <StorageDemo />;
+  return <AppNavigator />;
 }
 
 export default App;
