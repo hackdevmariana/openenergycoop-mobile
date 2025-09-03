@@ -6,13 +6,14 @@
  */
 
 import './src/styles/global.css';
-import { StatusBar, useColorScheme } from 'react-native';
+import { StatusBar } from 'react-native';
+import { useColorScheme } from 'react-native';
 import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
 import { QueryProvider } from './src/providers/QueryProvider';
 import { PaperProvider } from './src/providers/PaperProvider';
-import { NativeWindExample } from './src/components/NativeWindExample';
+import IconShowcase from './src/components/IconShowcase';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -30,9 +31,7 @@ function App() {
 }
 
 function AppContent() {
-  return <NativeWindExample />;
+  return <IconShowcase />;
 }
-
-
 
 export default App;
