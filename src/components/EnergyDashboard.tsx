@@ -6,15 +6,22 @@ import {
   useTheme, 
   Surface,
   Chip,
-  Avatar,
   Divider,
   FAB,
-  IconButton,
 } from 'react-native-paper';
-import { EnergyCard, EnergyButton, EnergyTextInput } from './ui';
+import { EnergyCard, EnergyButton, EnergyTextInput, EnergyIcon } from './ui';
 import { useDashboardStats } from '../hooks/useDashboard';
 import { useEnergyStore } from '../stores/energyStore';
 import { useAppStore } from '../stores/appStore';
+
+const FABIcon = () => (
+  <EnergyIcon
+    type="action"
+    actionIcon="add"
+    size={24}
+    color="white"
+  />
+);
 
 export const EnergyDashboard: React.FC = () => {
   const theme = useTheme();
@@ -77,25 +84,28 @@ export const EnergyDashboard: React.FC = () => {
                 Monitoreo en tiempo real
               </Text>
             </View>
-            <Avatar.Icon 
-              size={48} 
-              icon="lightning-bolt" 
-              style={{ backgroundColor: theme.colors.primary }}
+            <EnergyIcon 
+              type="energy"
+              energyType="production"
+              size={48}
+              color={theme.colors.primary}
             />
           </View>
           
           <View style={styles.headerActions}>
-            <IconButton
-              icon="refresh"
+            <EnergyIcon
+              type="action"
+              actionIcon="refresh"
               size={24}
               onPress={handleRefresh}
-              iconColor={theme.colors.primary}
+              color={theme.colors.primary}
             />
-            <IconButton
-              icon="cog"
+            <EnergyIcon
+              type="action"
+              actionIcon="edit"
               size={24}
               onPress={() => {}}
-              iconColor={theme.colors.onSurfaceVariant}
+              color={theme.colors.onSurfaceVariant}
             />
           </View>
         </Surface>
@@ -255,7 +265,7 @@ export const EnergyDashboard: React.FC = () => {
 
       {/* FAB */}
       <FAB
-        icon="plus"
+        icon={FABIcon}
         style={[styles.fab, { backgroundColor: theme.colors.primary }]}
         onPress={() => {
           addNotification({

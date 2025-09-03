@@ -2,6 +2,7 @@
 export { EnergyCard } from './EnergyCard';
 export { EnergyButton } from './EnergyButton';
 export { EnergyTextInput } from './EnergyTextInput';
+export { EnergyIcon } from './EnergyIcon';
 
 // Re-exportar componentes de React Native Paper para conveniencia
 export {

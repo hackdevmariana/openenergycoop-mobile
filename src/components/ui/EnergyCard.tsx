@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Card, Text, useTheme } from 'react-native-paper';
 import { energyColors } from '../../theme';
+import { EnergyIcon } from './EnergyIcon';
 
 interface EnergyCardProps {
   title: string;
@@ -74,6 +75,12 @@ export const EnergyCard: React.FC<EnergyCardProps> = ({
         </View>
         
         <View style={styles.valueContainer}>
+          <EnergyIcon 
+            type="energy"
+            energyType={type}
+            size={32}
+            style={styles.valueIcon}
+          />
           <Text 
             variant="headlineMedium" 
             style={[
@@ -148,6 +155,9 @@ const styles = StyleSheet.create({
   },
   value: {
     marginRight: 8,
+  },
+  valueIcon: {
+    marginRight: 12,
   },
   unit: {
     fontSize: 16,
