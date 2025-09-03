@@ -6,6 +6,7 @@
  */
 
 import './src/styles/global.css';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'react-native';
 import { useColorScheme } from 'react-native';
 import {
@@ -13,25 +14,67 @@ import {
 } from 'react-native-safe-area-context';
 import { QueryProvider } from './src/providers/QueryProvider';
 import { PaperProvider } from './src/providers/PaperProvider';
-import IconShowcase from './src/components/IconShowcase';
+import StorageDemo from './src/components/StorageDemo';
+import { initializeStorage, verifyStorageIntegrity } from './src/services/storageInit';
+import { useAppStore } from './src/stores/appStore';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
+  const [isStorageReady, setIsStorageReady] = useState(false);
+  const { loadFromStorage, setInitialized } = useAppStore();
+
+  // Inicializar AsyncStorage al inicio de la aplicación
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        console.log('🚀 Iniciando aplicación...');
+        
+        // Inicializar AsyncStorage
+        const storageInitialized = await initializeStorage();
+        if (!storageInitialized) {
+          console.error('❌ Error inicializando AsyncStorage');
+          return;
+        }
+        
+        // Verificar integridad del almacenamiento
+        await verifyStorageIntegrity();
+        
+        // Cargar datos del store desde AsyncStorage
+        await loadFromStorage();
+        
+        // Marcar como inicializado
+        setInitialized(true);
+        setIsStorageReady(true);
+        
+        console.log('✅ Aplicación inicializada correctamente');
+      } catch (error) {
+        console.error('❌ Error inicializando la aplicación:', error);
+        // Aún así, marcar como listo para evitar bloqueos
+        setIsStorageReady(true);
+      }
+    };
+
+    initializeApp();
+  }, [loadFromStorage, setInitialized]);
 
   return (
     <QueryProvider>
       <PaperProvider>
         <SafeAreaProvider>
           <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-          <AppContent />
+          <AppContent isReady={isStorageReady} />
         </SafeAreaProvider>
       </PaperProvider>
     </QueryProvider>
   );
 }
 
-function AppContent() {
-  return <IconShowcase />;
+function AppContent({ isReady }: { isReady: boolean }) {
+  if (!isReady) {
+    return null; // O un componente de carga
+  }
+  
+  return <StorageDemo />;
 }
 
 export default App;
