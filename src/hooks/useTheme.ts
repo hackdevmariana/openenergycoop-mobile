@@ -3,6 +3,7 @@ import { useColorScheme, Appearance } from 'react-native';
 import { useAppStore } from '../stores/appStore';
 import { secureStore } from '../lib/secureStore';
 import { createTheme, ThemeMode, ColorScheme, Theme } from '../config/theme';
+import { useAccessibility } from '../services/accessibilityService';
 
 // Claves para almacenamiento seguro
 const THEME_KEYS = {
@@ -14,6 +15,7 @@ const THEME_KEYS = {
 export const useTheme = () => {
   const systemColorScheme = useColorScheme() as ColorScheme;
   const { themeMode, setThemeMode } = useAppStore();
+  const { getTextStyles, getFontSize } = useAccessibility();
   
   // Estado local del tema
   const [currentTheme, setCurrentTheme] = useState<Theme>(() => {
@@ -77,6 +79,23 @@ export const useTheme = () => {
     return currentTheme.shadows[size];
   }, [currentTheme.shadows]);
 
+  // Funciones de accesibilidad integradas
+  const getAccessibleTextStyles = useCallback((
+    baseSize: number,
+    contentType: 'title' | 'subtitle' | 'body' | 'caption' | 'button' = 'body',
+    state: 'normal' | 'focused' | 'pressed' | 'disabled' = 'normal'
+  ) => {
+    return getTextStyles(baseSize, contentType, state);
+  }, [getTextStyles]);
+
+  const getAccessibleFontSize = useCallback((
+    baseSize: number,
+    contentType: 'title' | 'subtitle' | 'body' | 'caption' | 'button' = 'body',
+    state: 'normal' | 'focused' | 'pressed' | 'disabled' = 'normal'
+  ) => {
+    return getFontSize(baseSize, contentType, state);
+  }, [getFontSize]);
+
   return {
     // Estado del tema
     theme: currentTheme,
@@ -94,6 +113,10 @@ export const useTheme = () => {
     // Funciones de utilidad
     getColor,
     getShadow,
+    
+    // Funciones de accesibilidad
+    getAccessibleTextStyles,
+    getAccessibleFontSize,
     
     // Información del sistema
     systemColorScheme,
