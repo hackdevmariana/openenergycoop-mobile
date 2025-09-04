@@ -16,6 +16,7 @@ import AppNavigator from './src/navigation/AppNavigator';
 import SentryErrorBoundary from './src/components/SentryErrorBoundary';
 import { initializeStorage, verifyStorageIntegrity } from './src/services/storageInit';
 import { initSentry } from './src/config/sentry';
+import { initPostHog } from './src/config/posthog';
 import { useAppStore } from './src/stores/appStore';
 import { useLoadTheme } from './src/hooks/useTheme';
 
@@ -24,14 +25,23 @@ function App() {
   const { loadFromStorage, setInitialized } = useAppStore();
   const { isLoading: isThemeLoading } = useLoadTheme();
 
-  // Inicializar Sentry al inicio de la aplicación
+  // Inicializar Sentry y PostHog al inicio de la aplicación
   useEffect(() => {
-    try {
-      initSentry();
-      console.log('✅ Sentry inicializado correctamente');
-    } catch (error) {
-      console.error('❌ Error inicializando Sentry:', error);
-    }
+    const initializeAnalytics = async () => {
+      try {
+        // Inicializar Sentry
+        initSentry();
+        console.log('✅ Sentry inicializado correctamente');
+        
+        // Inicializar PostHog
+        await initPostHog();
+        console.log('✅ PostHog inicializado correctamente');
+      } catch (error) {
+        console.error('❌ Error inicializando analytics:', error);
+      }
+    };
+
+    initializeAnalytics();
   }, []);
 
   // Inicializar AsyncStorage al inicio de la aplicación
