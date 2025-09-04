@@ -17,6 +17,7 @@ import NavigationGesturesDemo from '../components/NavigationGesturesDemo';
 import HelpGesturesDemo from '../components/HelpGesturesDemo';
 import SVGDemo from '../components/SVGDemo';
 import MapsDemo from '../components/MapsDemo';
+import NotificationsDemo from '../components/NotificationsDemo';
 
 // Crear navegadores
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -110,10 +111,10 @@ const MainTabNavigator: React.FC = () => {
       />
                   <Tab.Screen
               name="Settings"
-              component={MapsDemo}
+              component={NotificationsDemo}
               options={{
-                title: 'Maps',
-                tabBarLabel: 'Maps',
+                title: 'Notifications',
+                tabBarLabel: 'Notifications',
               }}
             />
     </Tab.Navigator>
