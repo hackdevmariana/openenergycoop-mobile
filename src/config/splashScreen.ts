@@ -158,6 +158,56 @@ export const useDynamicSplashTheme = () => {
     return null;
   };
 
+  // Obtener tema dinámico remoto (para eventos no programables)
+  const getRemoteTheme = async () => {
+    try {
+      const { dynamicContentService } = await import('../services/dynamicContentService');
+      const content = await dynamicContentService.getSplashContent();
+      
+      if (content) {
+        return {
+          background: content.colors.background,
+          primaryColor: content.colors.primary,
+          secondaryColor: content.colors.secondary,
+          text: content.colors.text,
+          icon: content.icon,
+          message: content.message,
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('❌ Error obteniendo tema remoto:', error);
+      return null;
+    }
+  };
+
+  // Obtener evento especial más relevante
+  const getRelevantEvent = async (userCountry?: string) => {
+    try {
+      const { dynamicContentService } = await import('../services/dynamicContentService');
+      const event = await dynamicContentService.getMostRelevantEvent(userCountry);
+      
+      if (event) {
+        return {
+          background: event.content.colors.background,
+          primaryColor: event.content.colors.primary,
+          secondaryColor: event.content.colors.secondary,
+          text: event.content.colors.text,
+          icon: event.content.icon,
+          message: event.content.message,
+          eventName: event.name,
+          eventType: event.type,
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('❌ Error obteniendo evento relevante:', error);
+      return null;
+    }
+  };
+
   const getThemeBasedOnTime = () => {
     const timeOfDay = getCurrentTime();
     const baseTheme = SEASONAL_THEMES[getCurrentSeason()];
@@ -198,6 +248,8 @@ export const useDynamicSplashTheme = () => {
     getCurrentTime,
     getSpecialTheme,
     getThemeBasedOnTime,
+    getRemoteTheme,
+    getRelevantEvent,
   };
 };
 
@@ -279,7 +331,7 @@ export const SplashScreenManager = {
 
 // Hook para usar Splash Screen
 export const useSplashScreen = () => {
-  const { getCurrentSeason, getCurrentTime, getSpecialTheme, getThemeBasedOnTime } = useDynamicSplashTheme();
+  const { getCurrentSeason, getCurrentTime, getSpecialTheme, getThemeBasedOnTime, getRemoteTheme, getRelevantEvent } = useDynamicSplashTheme();
 
   const showSplashScreen = () => {
     SplashScreenManager.show();
@@ -304,6 +356,27 @@ export const useSplashScreen = () => {
     return timeBasedTheme;
   };
 
+  const getDynamicTheme = async (userCountry?: string) => {
+    try {
+      // Prioridad: Evento remoto > Tema remoto > Tema local
+      const relevantEvent = await getRelevantEvent(userCountry);
+      if (relevantEvent) {
+        return relevantEvent;
+      }
+
+      const remoteTheme = await getRemoteTheme();
+      if (remoteTheme) {
+        return remoteTheme;
+      }
+
+      // Fallback a tema local
+      return getCurrentTheme();
+    } catch (error) {
+      console.error('❌ Error obteniendo tema dinámico:', error);
+      return getCurrentTheme();
+    }
+  };
+
   const setSeasonalTheme = () => {
     const theme = getCurrentTheme();
     SplashScreenManager.setDynamicTheme(theme);
@@ -313,13 +386,26 @@ export const useSplashScreen = () => {
     SplashScreenManager.setCustomContent(customTheme);
   };
 
+  const setDynamicTheme = async (userCountry?: string) => {
+    try {
+      const theme = await getDynamicTheme(userCountry);
+      SplashScreenManager.setDynamicTheme(theme);
+      return theme;
+    } catch (error) {
+      console.error('❌ Error configurando tema dinámico:', error);
+      return null;
+    }
+  };
+
   return {
     showSplashScreen,
     hideSplashScreen,
     hideSplashScreenWithAnimation,
     getCurrentTheme,
+    getDynamicTheme,
     setSeasonalTheme,
     setCustomTheme,
+    setDynamicTheme,
     getCurrentSeason,
     getCurrentTime,
     getSpecialTheme,

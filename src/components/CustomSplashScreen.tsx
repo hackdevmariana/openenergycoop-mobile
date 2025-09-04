@@ -29,7 +29,7 @@ const CustomSplashScreen: React.FC<CustomSplashScreenProps> = ({
   enableAnimations = true,
   customTheme,
 }) => {
-  const { getCurrentTheme, setSeasonalTheme } = useSplashScreen();
+  const { getCurrentTheme, getDynamicTheme, setSeasonalTheme } = useSplashScreen();
   const { getCurrentSeason, getCurrentTime } = useDynamicSplashTheme();
   const { themedClasses } = useTheme();
   const { trackUserAction } = usePostHogAnalytics();
@@ -57,12 +57,30 @@ const CustomSplashScreen: React.FC<CustomSplashScreenProps> = ({
 
   // Configurar tema dinámico
   useEffect(() => {
-    if (customTheme) {
-      setCurrentTheme(customTheme);
-    } else {
-      setSeasonalTheme();
-      setCurrentTheme(getCurrentTheme());
-    }
+    const loadDynamicTheme = async () => {
+      if (customTheme) {
+        setCurrentTheme(customTheme);
+      } else {
+        try {
+          // Intentar obtener tema dinámico remoto
+          const dynamicTheme = await getDynamicTheme();
+          if (dynamicTheme) {
+            setCurrentTheme(dynamicTheme);
+          } else {
+            // Fallback a tema local
+            setSeasonalTheme();
+            setCurrentTheme(getCurrentTheme());
+          }
+        } catch (error) {
+          console.error('❌ Error cargando tema dinámico:', error);
+          // Fallback a tema local
+          setSeasonalTheme();
+          setCurrentTheme(getCurrentTheme());
+        }
+      }
+    };
+
+    loadDynamicTheme();
   }, [customTheme]);
 
   // Animaciones de entrada
