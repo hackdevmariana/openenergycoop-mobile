@@ -7,8 +7,6 @@
 
 import './src/styles/global.css';
 import React, { useEffect, useState } from 'react';
-import { StatusBar } from 'react-native';
-import { useColorScheme } from 'react-native';
 import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
@@ -19,11 +17,12 @@ import SentryErrorBoundary from './src/components/SentryErrorBoundary';
 import { initializeStorage, verifyStorageIntegrity } from './src/services/storageInit';
 import { initSentry } from './src/config/sentry';
 import { useAppStore } from './src/stores/appStore';
+import { useLoadTheme } from './src/hooks/useTheme';
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
   const [isStorageReady, setIsStorageReady] = useState(false);
   const { loadFromStorage, setInitialized } = useAppStore();
+  const { isLoading: isThemeLoading } = useLoadTheme();
 
   // Inicializar Sentry al inicio de la aplicación
   useEffect(() => {
@@ -74,8 +73,7 @@ function App() {
       <QueryProvider>
         <PaperProvider>
           <SafeAreaProvider>
-            <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-            <AppContent isReady={isStorageReady} />
+            <AppContent isReady={isStorageReady && !isThemeLoading} />
           </SafeAreaProvider>
         </PaperProvider>
       </QueryProvider>

@@ -2,3 +2,178 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Estilos base para React Native */
+@layer base {
+  /* Reset básico para React Native */
+  * {
+    box-sizing: border-box;
+  }
+}
+
+/* Componentes personalizados */
+@layer components {
+  /* Botones temáticos */
+  .btn-primary {
+    @apply bg-primary text-white px-4 py-2 rounded-md shadow-medium;
+  }
+  
+  .btn-secondary {
+    @apply bg-surface border border-border text-text px-4 py-2 rounded-md;
+  }
+  
+  .btn-accent {
+    @apply bg-accent text-white px-4 py-2 rounded-md shadow-small;
+  }
+  
+  /* Tarjetas temáticas */
+  .card {
+    @apply bg-card rounded-md p-4 shadow-medium;
+  }
+  
+  .card-elevated {
+    @apply bg-card rounded-md p-4 shadow-large;
+  }
+  
+  /* Inputs temáticos */
+  .input {
+    @apply bg-surface border border-border rounded-sm p-2 text-text;
+  }
+  
+  .input-focused {
+    @apply bg-surface border border-primary rounded-sm p-2 text-text;
+  }
+  
+  /* Textos temáticos */
+  .text-primary {
+    @apply text-text font-medium;
+  }
+  
+  .text-secondary {
+    @apply text-text-secondary text-sm;
+  }
+  
+  .text-tertiary {
+    @apply text-text-tertiary text-xs;
+  }
+  
+  /* Estados temáticos */
+  .state-success {
+    @apply bg-success text-white;
+  }
+  
+  .state-warning {
+    @apply bg-warning text-white;
+  }
+  
+  .state-error {
+    @apply bg-error text-white;
+  }
+  
+  .state-info {
+    @apply bg-info text-white;
+  }
+  
+  /* Energía temática */
+  .energy-solar {
+    @apply bg-energy-solar;
+  }
+  
+  .energy-wind {
+    @apply bg-energy-wind;
+  }
+  
+  .energy-hydro {
+    @apply bg-energy-hydro;
+  }
+  
+  .energy-battery {
+    @apply bg-energy-battery;
+  }
+  
+  .energy-grid {
+    @apply bg-energy-grid;
+  }
+  
+  /* Layouts temáticos */
+  .container {
+    @apply bg-background flex-1;
+  }
+  
+  .surface {
+    @apply bg-surface;
+  }
+  
+  .divider {
+    @apply bg-divider h-px my-2;
+  }
+}
+
+/* Utilidades personalizadas */
+@layer utilities {
+  /* Sombras temáticas */
+  .shadow-theme-small {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    elevation: 1;
+  }
+  
+  .shadow-theme-medium {
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    elevation: 2;
+  }
+  
+  .shadow-theme-large {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15);
+    elevation: 4;
+  }
+  
+  /* Espaciado temático */
+  .space-xs {
+    @apply p-xs;
+  }
+  
+  .space-sm {
+    @apply p-sm;
+  }
+  
+  .space-md {
+    @apply p-md;
+  }
+  
+  .space-lg {
+    @apply p-lg;
+  }
+  
+  .space-xl {
+    @apply p-xl;
+  }
+  
+  .space-xxl {
+    @apply p-xxl;
+  }
+  
+  /* Bordes temáticos */
+  .rounded-xs {
+    @apply rounded-xs;
+  }
+  
+  .rounded-sm {
+    @apply rounded-sm;
+  }
+  
+  .rounded-md {
+    @apply rounded-md;
+  }
+  
+  .rounded-lg {
+    @apply rounded-lg;
+  }
+  
+  .rounded-xl {
+    @apply rounded-xl;
+  }
+  
+  .rounded-full {
+    @apply rounded-full;
+  }
+}
+
