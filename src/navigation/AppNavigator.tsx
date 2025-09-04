@@ -14,6 +14,7 @@ import DetailScreen from '../screens/DetailScreen';
 import StorageDemo from '../components/StorageDemo';
 import IconShowcase from '../components/IconShowcase';
 import NavigationGesturesDemo from '../components/NavigationGesturesDemo';
+import HelpGesturesDemo from '../components/HelpGesturesDemo';
 
 // Crear navegadores
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -99,10 +100,10 @@ const MainTabNavigator: React.FC = () => {
       />
       <Tab.Screen 
         name="Profile" 
-        component={IconShowcase}
+        component={HelpGesturesDemo}
         options={{
-          title: 'Perfil',
-          tabBarLabel: 'Perfil',
+          title: 'Ayuda',
+          tabBarLabel: 'Ayuda',
         }}
       />
       <Tab.Screen 
