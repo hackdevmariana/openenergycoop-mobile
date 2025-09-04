@@ -1,222 +1,51 @@
-# React Native Paper - Guía Completa
+import React, { useState } from 'react';
+import { View, ScrollView, Alert } from 'react-native';
+import {
+  Provider as PaperProvider,
+  Button,
+  Card,
+  Title,
+  Paragraph,
+  TextInput,
+  Switch,
+  Slider,
+  Chip,
+  List,
+  Modal,
+  Portal,
+  Snackbar,
+  Tooltip,
+  Badge,
+  Avatar,
+  Divider,
+  ProgressBar,
+  ActivityIndicator,
+  DataTable,
+  Searchbar,
+  BottomSheet,
+  Dialog,
+  Menu,
+  NavigationBar,
+  Pagination,
+  RatingBar,
+  TimePicker,
+  DatePicker,
+  FAB,
+  IconButton,
+  SegmentedButtons,
+  Checkbox,
+  RadioButton,
+  Banner,
+  Surface,
+  Appbar,
+  Drawer,
+  ToggleButton,
+  SegmentedButtons as SegmentedButtonsV4,
+} from 'react-native-paper';
+import { useTheme } from '../hooks/useTheme';
+import { usePaperComponents } from '../hooks/usePaperComponents';
+import { usePaperTheme } from '../config/paperTheme';
 
-## 📋 Tabla de Contenidos
-
-1. [Descripción General](#descripción-general)
-2. [Instalación y Configuración](#instalación-y-configuración)
-3. [Configuración de Temas](#configuración-de-temas)
-4. [Hook Personalizado](#hook-personalizado)
-5. [Componente de Demostración](#componente-de-demostración)
-6. [Casos de Uso](#casos-de-uso)
-7. [Mejores Prácticas](#mejores-prácticas)
-8. [Solución de Problemas](#solución-de-problemas)
-
-## 🌟 Descripción General
-
-**React Native Paper** es una biblioteca de componentes Material Design para React Native que proporciona una implementación completa de los componentes de Material Design con soporte para temas personalizados.
-
-### **¿Por qué React Native Paper?**
-
-#### **✅ Ventajas Principales**
-- 🎨 **Material Design**: Implementación completa de Material Design 3
-- 🎯 **Temas personalizados**: Soporte completo para temas claros y oscuros
-- 📱 **Multiplataforma**: Funciona perfectamente en iOS y Android
-- 🔧 **Configuración flexible**: Configuración detallada para cada componente
-- 📊 **Analytics integrado**: Seguimiento automático de interacciones
-- 🎮 **Componentes avanzados**: Modales, diálogos, bottom sheets, etc.
-- 🔄 **Compatibilidad**: Funciona con React Navigation y otras librerías
-- ⚡ **Rendimiento optimizado**: Componentes nativos para mejor rendimiento
-
-#### **❌ Alternativas Menos Recomendadas**
-- ❌ **React Native Elements**: Menos componentes y configuración limitada
-- ❌ **NativeBase**: Más complejo de configurar y menos flexible
-- ❌ **UI Kitten**: Menos componentes y documentación limitada
-
-## ⚙️ Instalación y Configuración
-
-### **1. Instalación**
-
-```bash
-npm install react-native-paper react-native-vector-icons react-native-safe-area-context
-```
-
-### **2. Configuración de Paper Provider**
-
-```typescript
-// App.tsx
-import { Provider as PaperProvider } from 'react-native-paper';
-import { usePaperTheme } from './src/config/paperTheme';
-
-const App: React.FC = () => {
-  const paperTheme = usePaperTheme();
-  
-  return (
-    <PaperProvider theme={paperTheme}>
-      {/* Tu app aquí */}
-    </PaperProvider>
-  );
-};
-```
-
-## 🎨 Configuración de Temas
-
-### **1. Configuración Básica**
-
-```typescript
-// src/config/paperTheme.ts
-import { MD3LightTheme, MD3DarkTheme, MD3Theme } from 'react-native-paper';
-
-// Tema claro personalizado
-export const lightTheme: MD3Theme = {
-  ...MD3LightTheme,
-  colors: {
-    ...MD3LightTheme.colors,
-    primary: '#2196F3',
-    secondary: '#FF9800',
-    tertiary: '#4CAF50',
-    error: '#F44336',
-    // ... más colores
-  },
-  roundness: 8,
-  version: 3,
-  isV3: true,
-};
-
-// Tema oscuro personalizado
-export const darkTheme: MD3Theme = {
-  ...MD3DarkTheme,
-  colors: {
-    ...MD3DarkTheme.colors,
-    primary: '#90CAF9',
-    secondary: '#FFB74D',
-    tertiary: '#81C784',
-    error: '#EF5350',
-    // ... más colores
-  },
-  roundness: 8,
-  version: 3,
-  isV3: true,
-};
-```
-
-### **2. Colores Personalizados**
-
-```typescript
-const customColors = {
-  // Colores de energía
-  energy: {
-    solar: '#FFD700',
-    wind: '#87CEEB',
-    hydro: '#4682B4',
-    nuclear: '#FF6B6B',
-    biomass: '#90EE90',
-    geothermal: '#FF8C00',
-  },
-  
-  // Colores de estado
-  status: {
-    success: '#4CAF50',
-    warning: '#FF9800',
-    error: '#F44336',
-    info: '#2196F3',
-  },
-  
-  // Colores de consumo
-  consumption: {
-    low: '#4CAF50',
-    medium: '#FF9800',
-    high: '#F44336',
-    critical: '#9C27B0',
-  },
-};
-```
-
-## 🎣 Hook Personalizado
-
-### **1. Hook usePaperComponents**
-
-```typescript
-// src/hooks/usePaperComponents.ts
-export const usePaperComponents = () => {
-  const paperTheme = usePaperTheme();
-  const { themedClasses } = useTheme();
-  const { trackUserAction } = usePostHogAnalytics();
-
-  // Configuraciones de componentes
-  const buttonConfig = useMemo(() => ({
-    ...componentConfig.button,
-    style: {
-      ...componentConfig.button.style,
-      borderRadius: paperTheme.roundness,
-    },
-  }), [paperTheme.roundness]);
-
-  // Funciones para crear componentes con estilos específicos
-  const createButton = useCallback((
-    variant: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'energy',
-    energyType?: 'solar' | 'wind' | 'hydro' | 'nuclear' | 'biomass' | 'geothermal'
-  ) => {
-    const baseConfig = { ...buttonConfig };
-    
-    if (variant === 'energy' && energyType) {
-      const energyStyle = customStyles.button.energy[energyType];
-      return {
-        ...baseConfig,
-        style: {
-          ...baseConfig.style,
-          backgroundColor: energyStyle.backgroundColor,
-        },
-        labelStyle: {
-          ...baseConfig.labelStyle,
-          color: energyStyle.color,
-        },
-      };
-    }
-    
-    const variantStyle = customStyles.button[variant];
-    return {
-      ...baseConfig,
-      style: {
-        ...baseConfig.style,
-        backgroundColor: variantStyle.backgroundColor,
-      },
-      labelStyle: {
-        ...baseConfig.labelStyle,
-        color: variantStyle.color,
-      },
-    };
-  }, [buttonConfig]);
-
-  // Funciones para manejar eventos
-  const handleButtonPress = useCallback((action: string, data?: any) => {
-    trackUserAction('button_pressed', { action, data });
-  }, [trackUserAction]);
-
-  return {
-    paperTheme,
-    buttonConfig,
-    cardConfig,
-    textInputConfig,
-    // ... más configuraciones
-    createButton,
-    createCard,
-    createChip,
-    createBadge,
-    createProgressBar,
-    handleButtonPress,
-    handleCardPress,
-    handleChipPress,
-    // ... más funciones
-  };
-};
-```
-
-## 🧩 Componente de Demostración
-
-### **1. ReactNativePaperDemo Component**
-
-```typescript
-// src/components/ReactNativePaperDemo.tsx
 const ReactNativePaperDemo: React.FC = () => {
   const { themedClasses } = useTheme();
   const { paperTheme } = usePaperTheme();
@@ -229,7 +58,23 @@ const ReactNativePaperDemo: React.FC = () => {
     handleButtonPress,
     handleCardPress,
     handleChipPress,
-    // ... más funciones
+    handleTextInputChange,
+    handleSwitchToggle,
+    handleSliderChange,
+    handleModalOpen,
+    handleModalClose,
+    handleSnackbarShow,
+    handleSnackbarDismiss,
+    handleDialogOpen,
+    handleDialogClose,
+    handleBottomSheetOpen,
+    handleBottomSheetClose,
+    handleSearchbarChange,
+    handleSearchbarSubmit,
+    handlePaginationChange,
+    handleRatingChange,
+    handleTimePickerConfirm,
+    handleDatePickerConfirm,
   } = usePaperComponents();
 
   // Estados para componentes interactivos
@@ -240,14 +85,51 @@ const ReactNativePaperDemo: React.FC = () => {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rating, setRating] = useState(3);
+  const [timePickerVisible, setTimePickerVisible] = useState(false);
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [selectedEnergy, setSelectedEnergy] = useState('solar');
+  const [checkboxValue, setCheckboxValue] = useState(false);
+  const [radioValue, setRadioValue] = useState('option1');
+  const [segmentedValue, setSegmentedValue] = useState('solar');
+  const [toggleValue, setToggleValue] = useState(false);
+
+  // Datos de ejemplo para la tabla
+  const [dataTableData] = useState([
+    { id: 1, name: 'Solar Panel A', efficiency: '85%', status: 'active' },
+    { id: 2, name: 'Wind Turbine B', efficiency: '92%', status: 'active' },
+    { id: 3, name: 'Hydro Plant C', efficiency: '78%', status: 'maintenance' },
+    { id: 4, name: 'Nuclear Reactor D', efficiency: '95%', status: 'active' },
+  ]);
 
   // Configuraciones de componentes
   const primaryButtonConfig = createButton('primary');
+  const secondaryButtonConfig = createButton('secondary');
+  const successButtonConfig = createButton('success');
+  const warningButtonConfig = createButton('warning');
+  const errorButtonConfig = createButton('error');
   const solarButtonConfig = createButton('energy', 'solar');
+  const windButtonConfig = createButton('energy', 'wind');
+  const hydroButtonConfig = createButton('energy', 'hydro');
+
   const solarCardConfig = createCard('energy', 'solar');
+  const windCardConfig = createCard('energy', 'wind');
+  const lowConsumptionCardConfig = createCard('consumption', 'low');
+  const highConsumptionCardConfig = createCard('consumption', 'high');
+
   const solarChipConfig = createChip('energy', 'solar');
+  const windChipConfig = createChip('energy', 'wind');
+  const successChipConfig = createChip('status', 'success');
+  const warningChipConfig = createChip('status', 'warning');
+
   const solarBadgeConfig = createBadge('energy', 'solar');
+  const lowConsumptionBadgeConfig = createBadge('consumption', 'low');
+
   const solarProgressBarConfig = createProgressBar('energy', 'solar');
+  const highConsumptionProgressBarConfig = createProgressBar('consumption', 'high');
 
   return (
     <PaperProvider theme={paperTheme}>
@@ -294,10 +176,52 @@ const ReactNativePaperDemo: React.FC = () => {
                 </Button>
                 
                 <Button
+                  {...secondaryButtonConfig}
+                  onPress={() => handleButtonPress('secondary', 'secondary_button')}
+                >
+                  Botón Secundario
+                </Button>
+                
+                <Button
+                  {...successButtonConfig}
+                  onPress={() => handleButtonPress('success', 'success_button')}
+                >
+                  Botón de Éxito
+                </Button>
+                
+                <Button
+                  {...warningButtonConfig}
+                  onPress={() => handleButtonPress('warning', 'warning_button')}
+                >
+                  Botón de Advertencia
+                </Button>
+                
+                <Button
+                  {...errorButtonConfig}
+                  onPress={() => handleButtonPress('error', 'error_button')}
+                >
+                  Botón de Error
+                </Button>
+                
+                <Button
                   {...solarButtonConfig}
                   onPress={() => handleButtonPress('energy', 'solar_button')}
                 >
                   🌞 Energía Solar
+                </Button>
+                
+                <Button
+                  {...windButtonConfig}
+                  onPress={() => handleButtonPress('energy', 'wind_button')}
+                >
+                  💨 Energía Eólica
+                </Button>
+                
+                <Button
+                  {...hydroButtonConfig}
+                  onPress={() => handleButtonPress('energy', 'hydro_button')}
+                >
+                  💧 Energía Hidráulica
                 </Button>
               </View>
             </Card.Content>
@@ -317,6 +241,36 @@ const ReactNativePaperDemo: React.FC = () => {
                   <Card.Content>
                     <Title>🌞 Energía Solar</Title>
                     <Paragraph>Generación de energía mediante paneles solares</Paragraph>
+                  </Card.Content>
+                </Card>
+                
+                <Card
+                  {...windCardConfig}
+                  onPress={() => handleCardPress('energy', 'wind_card')}
+                >
+                  <Card.Content>
+                    <Title>💨 Energía Eólica</Title>
+                    <Paragraph>Generación de energía mediante turbinas eólicas</Paragraph>
+                  </Card.Content>
+                </Card>
+                
+                <Card
+                  {...lowConsumptionCardConfig}
+                  onPress={() => handleCardPress('consumption', 'low_consumption_card')}
+                >
+                  <Card.Content>
+                    <Title>✅ Consumo Bajo</Title>
+                    <Paragraph>Consumo de energía dentro de los límites normales</Paragraph>
+                  </Card.Content>
+                </Card>
+                
+                <Card
+                  {...highConsumptionCardConfig}
+                  onPress={() => handleCardPress('consumption', 'high_consumption_card')}
+                >
+                  <Card.Content>
+                    <Title>⚠️ Consumo Alto</Title>
+                    <Paragraph>Consumo de energía por encima de los límites recomendados</Paragraph>
                   </Card.Content>
                 </Card>
               </View>
@@ -384,6 +338,17 @@ const ReactNativePaperDemo: React.FC = () => {
                   />
                 </View>
                 
+                <View className="flex-row justify-between items-center">
+                  <Paragraph>Notificaciones</Paragraph>
+                  <Switch
+                    value={!switchValue}
+                    onValueChange={(value) => {
+                      setSwitchValue(!value);
+                      handleSwitchToggle('notifications', { value });
+                    }}
+                  />
+                </View>
+                
                 <View>
                   <Paragraph>Nivel de eficiencia: {sliderValue}%</Paragraph>
                   <Slider
@@ -395,6 +360,20 @@ const ReactNativePaperDemo: React.FC = () => {
                     minimumValue={0}
                     maximumValue={100}
                     step={5}
+                  />
+                </View>
+                
+                <View>
+                  <Paragraph>Umbral de alerta: {sliderValue} kWh</Paragraph>
+                  <Slider
+                    value={sliderValue}
+                    onValueChange={(value) => {
+                      setSliderValue(value);
+                      handleSliderChange('alert_threshold', { value });
+                    }}
+                    minimumValue={0}
+                    maximumValue={1000}
+                    step={10}
                   />
                 </View>
               </View>
@@ -415,6 +394,27 @@ const ReactNativePaperDemo: React.FC = () => {
                   >
                     🌞 Solar
                   </Chip>
+                  
+                  <Chip
+                    {...windChipConfig}
+                    onPress={() => handleChipPress('energy', 'wind_chip')}
+                  >
+                    💨 Eólica
+                  </Chip>
+                  
+                  <Chip
+                    {...successChipConfig}
+                    onPress={() => handleChipPress('status', 'success_chip')}
+                  >
+                    ✅ Activo
+                  </Chip>
+                  
+                  <Chip
+                    {...warningChipConfig}
+                    onPress={() => handleChipPress('status', 'warning_chip')}
+                  >
+                    ⚠️ Mantenimiento
+                  </Chip>
                 </View>
               </View>
             </Card.Content>
@@ -434,6 +434,18 @@ const ReactNativePaperDemo: React.FC = () => {
                     left={(props) => <List.Icon {...props} icon="solar-panel" />}
                     right={(props) => <Badge {...solarBadgeConfig}>85%</Badge>}
                   />
+                  <List.Item
+                    title="Turbina Eólica B"
+                    description="Eficiencia: 92% | Estado: Activo"
+                    left={(props) => <List.Icon {...props} icon="wind-turbine" />}
+                    right={(props) => <Badge {...lowConsumptionBadgeConfig}>92%</Badge>}
+                  />
+                  <List.Item
+                    title="Planta Hidráulica C"
+                    description="Eficiencia: 78% | Estado: Mantenimiento"
+                    left={(props) => <List.Icon {...props} icon="water" />}
+                    right={(props) => <Badge {...highConsumptionProgressBarConfig}>78%</Badge>}
+                  />
                 </List.Section>
               </View>
             </Card.Content>
@@ -451,6 +463,15 @@ const ReactNativePaperDemo: React.FC = () => {
                   <ProgressBar
                     {...solarProgressBarConfig}
                     progress={0.75}
+                    style={{ height: 8 }}
+                  />
+                </View>
+                
+                <View>
+                  <Paragraph>Consumo Actual: 85%</Paragraph>
+                  <ProgressBar
+                    {...highConsumptionProgressBarConfig}
+                    progress={0.85}
                     style={{ height: 8 }}
                   />
                 </View>
@@ -537,6 +558,17 @@ const ReactNativePaperDemo: React.FC = () => {
                     }}
                   />
                   <Paragraph className="ml-2">Habilitar notificaciones</Paragraph>
+                </View>
+                
+                <View className="flex-row items-center">
+                  <Checkbox
+                    status={!checkboxValue ? 'checked' : 'unchecked'}
+                    onPress={() => {
+                      setCheckboxValue(!checkboxValue);
+                      handleSwitchToggle('auto_optimization', { value: !checkboxValue });
+                    }}
+                  />
+                  <Paragraph className="ml-2">Optimización automática</Paragraph>
                 </View>
                 
                 <View>
@@ -922,363 +954,5 @@ const ReactNativePaperDemo: React.FC = () => {
     </PaperProvider>
   );
 };
-```
 
-## 🎯 Casos de Uso
-
-### **1. Formularios de Configuración**
-
-```typescript
-const SettingsForm: React.FC = () => {
-  const { createButton, handleTextInputChange, handleSwitchToggle } = usePaperComponents();
-  const [deviceName, setDeviceName] = useState('');
-  const [autoMode, setAutoMode] = useState(false);
-
-  const primaryButtonConfig = createButton('primary');
-
-  return (
-    <View className="p-4">
-      <TextInput
-        label="Nombre del dispositivo"
-        value={deviceName}
-        onChangeText={(value) => {
-          setDeviceName(value);
-          handleTextInputChange('device_name', { value });
-        }}
-        mode="outlined"
-      />
-      
-      <View className="flex-row justify-between items-center mt-4">
-        <Paragraph>Modo automático</Paragraph>
-        <Switch
-          value={autoMode}
-          onValueChange={(value) => {
-            setAutoMode(value);
-            handleSwitchToggle('auto_mode', { value });
-          }}
-        />
-      </View>
-      
-      <Button
-        {...primaryButtonConfig}
-        onPress={() => handleButtonPress('save_settings', { deviceName, autoMode })}
-        className="mt-4"
-      >
-        Guardar Configuración
-      </Button>
-    </View>
-  );
-};
-```
-
-### **2. Lista de Dispositivos**
-
-```typescript
-const DeviceList: React.FC = () => {
-  const { createCard, handleCardPress } = usePaperComponents();
-  const [devices] = useState([
-    { id: 1, name: 'Panel Solar A', type: 'solar', efficiency: 85 },
-    { id: 2, name: 'Turbina Eólica B', type: 'wind', efficiency: 92 },
-  ]);
-
-  return (
-    <View className="p-4">
-      {devices.map((device) => {
-        const cardConfig = createCard('energy', device.type);
-        
-        return (
-          <Card
-            key={device.id}
-            {...cardConfig}
-            onPress={() => handleCardPress('device', { device })}
-            className="mb-4"
-          >
-            <Card.Content>
-              <Title>{device.name}</Title>
-              <Paragraph>Eficiencia: {device.efficiency}%</Paragraph>
-            </Card.Content>
-          </Card>
-        );
-      })}
-    </View>
-  );
-};
-```
-
-### **3. Dashboard con Métricas**
-
-```typescript
-const EnergyDashboard: React.FC = () => {
-  const { createProgressBar, createChip } = usePaperComponents();
-  const [metrics] = useState({
-    solarGeneration: 75,
-    windGeneration: 60,
-    consumption: 85,
-  });
-
-  const solarProgressConfig = createProgressBar('energy', 'solar');
-  const windProgressConfig = createProgressBar('energy', 'wind');
-  const consumptionProgressConfig = createProgressBar('consumption', 'high');
-  const solarChipConfig = createChip('energy', 'solar');
-  const windChipConfig = createChip('energy', 'wind');
-
-  return (
-    <View className="p-4">
-      <Title>Dashboard de Energía</Title>
-      
-      <Card className="mt-4">
-        <Card.Content>
-          <Title>Generación Solar</Title>
-          <ProgressBar
-            {...solarProgressConfig}
-            progress={metrics.solarGeneration / 100}
-            style={{ height: 8 }}
-          />
-          <Chip {...solarChipConfig} className="mt-2">
-            {metrics.solarGeneration}%
-          </Chip>
-        </Card.Content>
-      </Card>
-      
-      <Card className="mt-4">
-        <Card.Content>
-          <Title>Generación Eólica</Title>
-          <ProgressBar
-            {...windProgressConfig}
-            progress={metrics.windGeneration / 100}
-            style={{ height: 8 }}
-          />
-          <Chip {...windChipConfig} className="mt-2">
-            {metrics.windGeneration}%
-          </Chip>
-        </Card.Content>
-      </Card>
-      
-      <Card className="mt-4">
-        <Card.Content>
-          <Title>Consumo Actual</Title>
-          <ProgressBar
-            {...consumptionProgressConfig}
-            progress={metrics.consumption / 100}
-            style={{ height: 8 }}
-          />
-        </Card.Content>
-      </Card>
-    </View>
-  );
-};
-```
-
-### **4. Modal de Confirmación**
-
-```typescript
-const ConfirmationModal: React.FC = () => {
-  const { handleDialogOpen, handleDialogClose } = usePaperComponents();
-  const [dialogVisible, setDialogVisible] = useState(false);
-
-  const showConfirmation = () => {
-    setDialogVisible(true);
-    handleDialogOpen('delete_device', {});
-  };
-
-  const handleConfirm = () => {
-    setDialogVisible(false);
-    handleDialogClose('delete_device', { confirmed: true });
-  };
-
-  const handleCancel = () => {
-    setDialogVisible(false);
-    handleDialogClose('delete_device', { confirmed: false });
-  };
-
-  return (
-    <>
-      <Button mode="contained" onPress={showConfirmation}>
-        Eliminar Dispositivo
-      </Button>
-      
-      <Portal>
-        <Dialog visible={dialogVisible} onDismiss={handleCancel}>
-          <Dialog.Title>Confirmar Eliminación</Dialog.Title>
-          <Dialog.Content>
-            <Paragraph>
-              ¿Estás seguro de que quieres eliminar este dispositivo? 
-              Esta acción no se puede deshacer.
-            </Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={handleCancel}>Cancelar</Button>
-            <Button onPress={handleConfirm}>Eliminar</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-    </>
-  );
-};
-```
-
-## ✅ Mejores Prácticas
-
-### **1. Uso de PaperProvider**
-
-```typescript
-// ✅ Correcto - Envolver toda la app
-const App: React.FC = () => {
-  const paperTheme = usePaperTheme();
-  
-  return (
-    <PaperProvider theme={paperTheme}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={HomeScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </PaperProvider>
-  );
-};
-
-// ❌ Incorrecto - No envolver la app
-const App: React.FC = () => {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
-```
-
-### **2. Configuración de Temas**
-
-```typescript
-// ✅ Correcto - Usar configuración personalizada
-const paperTheme = usePaperTheme();
-const buttonConfig = createButton('primary');
-
-// ❌ Incorrecto - Usar configuración por defecto
-const buttonConfig = { mode: 'contained' };
-```
-
-### **3. Manejo de Eventos**
-
-```typescript
-// ✅ Correcto - Usar funciones de manejo de eventos
-const handlePress = () => {
-  handleButtonPress('primary', 'save_button');
-  // Lógica adicional
-};
-
-// ❌ Incorrecto - No usar funciones de manejo
-const handlePress = () => {
-  // Solo lógica sin tracking
-};
-```
-
-### **4. Componentes Compuestos**
-
-```typescript
-// ✅ Correcto - Usar componentes compuestos
-const cardConfig = createCard('energy', 'solar');
-const chipConfig = createChip('status', 'success');
-
-// ❌ Incorrecto - Crear configuraciones manualmente
-const cardConfig = {
-  style: { backgroundColor: '#FFD700' },
-  // Configuración manual
-};
-```
-
-## 🔧 Solución de Problemas
-
-### **1. Componentes no se renderizan**
-
-**Problema**: Los componentes de Paper no se muestran
-
-**Solución**:
-```typescript
-// Verificar que PaperProvider esté configurado
-import { Provider as PaperProvider } from 'react-native-paper';
-
-const App: React.FC = () => {
-  return (
-    <PaperProvider theme={paperTheme}>
-      {/* Tu app aquí */}
-    </PaperProvider>
-  );
-};
-```
-
-### **2. Temas no se aplican**
-
-**Problema**: Los temas no se aplican correctamente
-
-**Solución**:
-```typescript
-// Verificar configuración de tema
-const paperTheme = usePaperTheme();
-console.log('Tema actual:', paperTheme.dark ? 'Oscuro' : 'Claro');
-```
-
-### **3. Iconos no se muestran**
-
-**Problema**: Los iconos no aparecen
-
-**Solución**:
-```bash
-# Instalar react-native-vector-icons
-npm install react-native-vector-icons
-
-# Configurar en Android (android/app/build.gradle)
-apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
-```
-
-### **4. Rendimiento lento**
-
-**Problema**: Los componentes causan lag
-
-**Solución**:
-```typescript
-// Usar useMemo para optimizar
-const buttonConfig = useMemo(() => createButton('primary'), [createButton]);
-
-// Usar useCallback para funciones
-const handlePress = useCallback(() => {
-  handleButtonPress('primary', 'button');
-}, [handleButtonPress]);
-```
-
-### **5. Estilos no se aplican**
-
-**Problema**: Los estilos personalizados no funcionan
-
-**Solución**:
-```typescript
-// Verificar configuración de estilos
-const customStyles = {
-  button: {
-    primary: {
-      backgroundColor: '#2196F3',
-      color: '#FFFFFF',
-    },
-  },
-};
-
-// Usar en componente
-const buttonConfig = createButton('primary');
-```
-
-## 🎉 Conclusión
-
-React Native Paper proporciona:
-
-- ✅ **Material Design completo** con soporte para Material Design 3
-- ✅ **Temas personalizados** para modo claro y oscuro
-- ✅ **Componentes avanzados** como modales, diálogos, bottom sheets
-- ✅ **Integración perfecta** con React Navigation
-- ✅ **Analytics automático** de interacciones
-- ✅ **Soporte multiplataforma** completo
-- ✅ **API intuitiva** y fácil de usar
-- ✅ **Configuración flexible** para diferentes casos de uso
-
-El sistema está completamente configurado y listo para usar, proporcionando una experiencia de usuario moderna y consistente con Material Design. 🚀
+export default ReactNativePaperDemo;
