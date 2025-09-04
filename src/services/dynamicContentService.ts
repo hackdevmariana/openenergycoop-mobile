@@ -27,6 +27,64 @@ export interface DynamicContent {
     description?: string;
     tags?: string[];
   };
+  // Nuevas propiedades para código interactivo
+  interactive?: {
+    type: 'countdown' | 'progress' | 'animation' | 'custom';
+    config: CountdownConfig | ProgressConfig | AnimationConfig | CustomConfig;
+    code?: string; // Código JavaScript/TypeScript para lógica personalizada
+  };
+}
+
+// Configuraciones para diferentes tipos de interactividad
+export interface CountdownConfig {
+  targetDate: string;
+  format: 'days' | 'hours' | 'minutes' | 'seconds' | 'full';
+  showLabels: boolean;
+  labels: {
+    days: string;
+    hours: string;
+    minutes: string;
+    seconds: string;
+  };
+  style: {
+    fontSize: number;
+    fontWeight: string;
+    color: string;
+    backgroundColor: string;
+    borderRadius: number;
+    padding: number;
+  };
+  animation: {
+    enabled: boolean;
+    type: 'pulse' | 'bounce' | 'shake' | 'fade';
+    duration: number;
+  };
+}
+
+export interface ProgressConfig {
+  total: number;
+  current: number;
+  unit: string;
+  showPercentage: boolean;
+  style: {
+    height: number;
+    backgroundColor: string;
+    progressColor: string;
+    borderRadius: number;
+  };
+}
+
+export interface AnimationConfig {
+  type: 'particles' | 'confetti' | 'stars' | 'waves';
+  duration: number;
+  intensity: number;
+  colors: string[];
+}
+
+export interface CustomConfig {
+  component: string;
+  props: Record<string, any>;
+  logic: string; // Código JavaScript para lógica personalizada
 }
 
 // Tipos para eventos especiales
@@ -293,6 +351,174 @@ class DynamicContentService {
     return await this.createManualEvent(victoryEvent);
   }
 
+  // Ejemplo: Crear evento Black Friday con cuenta atrás
+  async createBlackFridayEvent(): Promise<boolean> {
+    const blackFridayDate = new Date();
+    blackFridayDate.setDate(blackFridayDate.getDate() + 7); // 7 días desde ahora
+    
+    const blackFridayEvent: Omit<SpecialEvent, 'id'> = {
+      name: 'Black Friday',
+      type: 'custom',
+      startDate: new Date().toISOString(),
+      endDate: blackFridayDate.toISOString(),
+      priority: 95,
+      isActive: true,
+      content: {
+        id: 'black_friday_splash',
+        type: 'splash_screen',
+        title: 'Black Friday',
+        message: '¡Las mejores ofertas en energía renovable!',
+        icon: '🛍️',
+        colors: {
+          background: '#000000',
+          primary: '#FFD700',
+          secondary: '#FF0000',
+          text: '#FFFFFF',
+        },
+        startDate: new Date().toISOString(),
+        endDate: blackFridayDate.toISOString(),
+        priority: 95,
+        conditions: {
+          countries: ['ES', 'MX', 'AR', 'CO', 'PE', 'VE', 'CL', 'EC', 'BO', 'PY', 'UY'],
+        },
+        metadata: {
+          event: 'black_friday',
+          description: 'Black Friday - Ofertas especiales',
+          tags: ['shopping', 'black_friday', 'offers', 'energy'],
+        },
+        interactive: {
+          type: 'countdown',
+          config: {
+            targetDate: blackFridayDate.toISOString(),
+            format: 'full',
+            showLabels: true,
+            labels: {
+              days: 'Días',
+              hours: 'Horas',
+              minutes: 'Min',
+              seconds: 'Seg',
+            },
+            style: {
+              fontSize: 24,
+              fontWeight: 'bold',
+              color: '#FFD700',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              borderRadius: 12,
+              padding: 16,
+            },
+            animation: {
+              enabled: true,
+              type: 'pulse',
+              duration: 2000,
+            },
+          },
+        },
+      },
+    };
+
+    return await this.createManualEvent(blackFridayEvent);
+  }
+
+  // Ejemplo: Crear evento de lanzamiento con barra de progreso
+  async createProductLaunchEvent(): Promise<boolean> {
+    const launchEvent: Omit<SpecialEvent, 'id'> = {
+      name: 'Lanzamiento Nuevo Producto',
+      type: 'custom',
+      startDate: new Date().toISOString(),
+      endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 días
+      priority: 90,
+      isActive: true,
+      content: {
+        id: 'product_launch_splash',
+        type: 'splash_screen',
+        title: 'Nuevo Producto',
+        message: 'Descubre nuestra nueva solución de energía',
+        icon: '⚡',
+        colors: {
+          background: '#1C1C1E',
+          primary: '#FFD700',
+          secondary: '#87CEEB',
+          text: '#FFFFFF',
+        },
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+        priority: 90,
+        conditions: {
+          countries: ['ES', 'MX', 'AR'],
+        },
+        metadata: {
+          event: 'product_launch',
+          description: 'Lanzamiento de nuevo producto',
+          tags: ['product', 'launch', 'energy'],
+        },
+        interactive: {
+          type: 'progress',
+          config: {
+            total: 1000,
+            current: 750,
+            unit: 'usuarios',
+            showPercentage: true,
+            style: {
+              height: 8,
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              progressColor: '#FFD700',
+              borderRadius: 4,
+            },
+          },
+        },
+      },
+    };
+
+    return await this.createManualEvent(launchEvent);
+  }
+
+  // Ejemplo: Crear evento con animaciones
+  async createCelebrationEvent(): Promise<boolean> {
+    const celebrationEvent: Omit<SpecialEvent, 'id'> = {
+      name: 'Celebración Especial',
+      type: 'custom',
+      startDate: new Date().toISOString(),
+      endDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 1 día
+      priority: 85,
+      isActive: true,
+      content: {
+        id: 'celebration_splash',
+        type: 'splash_screen',
+        title: '¡Celebración!',
+        message: '¡Gracias por ser parte de nuestra comunidad!',
+        icon: '🎉',
+        colors: {
+          background: '#FF6B6B',
+          primary: '#FFFFFF',
+          secondary: '#FFD700',
+          text: '#FFFFFF',
+        },
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        priority: 85,
+        conditions: {
+          countries: ['*'], // Todos los países
+        },
+        metadata: {
+          event: 'celebration',
+          description: 'Celebración especial',
+          tags: ['celebration', 'community', 'thanks'],
+        },
+        interactive: {
+          type: 'animation',
+          config: {
+            type: 'confetti',
+            duration: 3000,
+            intensity: 50,
+            colors: ['#FFD700', '#FF0000', '#00FF00', '#0000FF', '#FF00FF'],
+          },
+        },
+      },
+    };
+
+    return await this.createManualEvent(celebrationEvent);
+  }
+
   // Ejemplo: Crear evento para Día de la Hispanidad
   async createHispanicDayEvent(): Promise<boolean> {
     const hispanicEvent: Omit<SpecialEvent, 'id'> = {
@@ -471,6 +697,54 @@ export const useDynamicContent = () => {
     }
   };
 
+  const createBlackFridayEvent = async () => {
+    setIsLoading(true);
+    try {
+      const success = await dynamicContentService.createBlackFridayEvent();
+      if (success) {
+        await loadSpecialEvents(); // Recargar eventos
+      }
+      return success;
+    } catch (error) {
+      console.error('❌ Error creando evento Black Friday:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createProductLaunchEvent = async () => {
+    setIsLoading(true);
+    try {
+      const success = await dynamicContentService.createProductLaunchEvent();
+      if (success) {
+        await loadSpecialEvents(); // Recargar eventos
+      }
+      return success;
+    } catch (error) {
+      console.error('❌ Error creando evento de lanzamiento:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createCelebrationEvent = async () => {
+    setIsLoading(true);
+    try {
+      const success = await dynamicContentService.createCelebrationEvent();
+      if (success) {
+        await loadSpecialEvents(); // Recargar eventos
+      }
+      return success;
+    } catch (error) {
+      console.error('❌ Error creando evento de celebración:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const syncContent = async () => {
     await dynamicContentService.syncContent();
     await loadSplashContent();
@@ -484,6 +758,9 @@ export const useDynamicContent = () => {
     loadSplashContent,
     loadSpecialEvents,
     createVictoryEvent,
+    createBlackFridayEvent,
+    createProductLaunchEvent,
+    createCelebrationEvent,
     syncContent,
   };
 };

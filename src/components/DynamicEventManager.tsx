@@ -9,7 +9,7 @@ import { SpecialEvent, DynamicContent } from '../services/dynamicContentService'
 const DynamicEventManager: React.FC = () => {
   const { themedClasses } = useTheme();
   const { trackUserAction } = usePostHogAnalytics();
-  const { splashContent, specialEvents, isLoading, loadSplashContent, loadSpecialEvents, createVictoryEvent, syncContent } = useDynamicContent();
+  const { splashContent, specialEvents, isLoading, loadSplashContent, loadSpecialEvents, createVictoryEvent, createBlackFridayEvent, createProductLaunchEvent, createCelebrationEvent, syncContent } = useDynamicContent();
 
   const [newEvent, setNewEvent] = useState({
     name: '',
@@ -47,6 +47,48 @@ const DynamicEventManager: React.FC = () => {
       }
     } catch (error) {
       Alert.alert('❌ Error', 'Error al crear el evento de victoria');
+    }
+  };
+
+  const handleCreateBlackFridayEvent = async () => {
+    try {
+      const success = await createBlackFridayEvent();
+      if (success) {
+        Alert.alert('✅ Éxito', 'Evento Black Friday con cuenta atrás creado correctamente');
+        await loadSpecialEvents(); // Recargar eventos
+      } else {
+        Alert.alert('❌ Error', 'No se pudo crear el evento Black Friday');
+      }
+    } catch (error) {
+      Alert.alert('❌ Error', 'Error al crear el evento Black Friday');
+    }
+  };
+
+  const handleCreateProductLaunchEvent = async () => {
+    try {
+      const success = await createProductLaunchEvent();
+      if (success) {
+        Alert.alert('✅ Éxito', 'Evento de lanzamiento con barra de progreso creado correctamente');
+        await loadSpecialEvents(); // Recargar eventos
+      } else {
+        Alert.alert('❌ Error', 'No se pudo crear el evento de lanzamiento');
+      }
+    } catch (error) {
+      Alert.alert('❌ Error', 'Error al crear el evento de lanzamiento');
+    }
+  };
+
+  const handleCreateCelebrationEvent = async () => {
+    try {
+      const success = await createCelebrationEvent();
+      if (success) {
+        Alert.alert('✅ Éxito', 'Evento de celebración con confeti creado correctamente');
+        await loadSpecialEvents(); // Recargar eventos
+      } else {
+        Alert.alert('❌ Error', 'No se pudo crear el evento de celebración');
+      }
+    } catch (error) {
+      Alert.alert('❌ Error', 'Error al crear el evento de celebración');
     }
   };
 
@@ -198,6 +240,36 @@ const DynamicEventManager: React.FC = () => {
               >
                 <Text className="text-white font-medium text-center">
                   🏆 Crear Evento de Victoria (España)
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                className={themedClasses.btnSecondary}
+                onPress={handleCreateBlackFridayEvent}
+                disabled={isLoading}
+              >
+                <Text className="font-medium text-center">
+                  🛍️ Crear Black Friday (Cuenta Atrás)
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                className={themedClasses.btnSecondary}
+                onPress={handleCreateProductLaunchEvent}
+                disabled={isLoading}
+              >
+                <Text className="font-medium text-center">
+                  ⚡ Crear Lanzamiento (Barra Progreso)
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                className={themedClasses.btnSecondary}
+                onPress={handleCreateCelebrationEvent}
+                disabled={isLoading}
+              >
+                <Text className="font-medium text-center">
+                  🎉 Crear Celebración (Confeti)
                 </Text>
               </TouchableOpacity>
               

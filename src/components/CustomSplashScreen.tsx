@@ -11,6 +11,7 @@ import {
 import { useSplashScreen, useDynamicSplashTheme } from '../config/splashScreen';
 import { useTheme } from '../hooks/useTheme';
 import { usePostHogAnalytics } from '../hooks/usePostHogAnalytics';
+import { InteractiveComponent } from './splash/InteractiveComponents';
 
 const { width, height } = Dimensions.get('window');
 
@@ -234,6 +235,23 @@ const CustomSplashScreen: React.FC<CustomSplashScreenProps> = ({
           </Text>
         </Animated.View>
 
+        {/* Componente interactivo */}
+        {currentTheme.interactive && (
+          <View style={styles.interactiveContainer}>
+            <InteractiveComponent
+              type={currentTheme.interactive.type}
+              config={currentTheme.interactive.config}
+              onComplete={() => {
+                console.log('🎉 Evento interactivo completado');
+                trackUserAction('interactive_event_completed', {
+                  event_type: currentTheme.interactive.type,
+                  event_name: currentTheme.eventName,
+                });
+              }}
+            />
+          </View>
+        )}
+
         {/* Información adicional */}
         <View style={styles.infoContainer}>
           <Text style={[styles.season, { color: currentTheme.secondaryColor }]}>
@@ -337,6 +355,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     lineHeight: 24,
+  },
+  interactiveContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   infoContainer: {
     flexDirection: 'row',
