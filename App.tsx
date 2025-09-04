@@ -19,6 +19,7 @@ import { initSentry } from './src/config/sentry';
 import { initPostHog } from './src/config/posthog';
 import { useAppStore } from './src/stores/appStore';
 import { useLoadTheme } from './src/hooks/useTheme';
+import CustomSplashScreen from './src/components/CustomSplashScreen';
 
 function App() {
   const [isStorageReady, setIsStorageReady] = useState(false);
@@ -92,8 +93,28 @@ function App() {
 }
 
 function AppContent({ isReady }: { isReady: boolean }) {
+  const [showSplash, setShowSplash] = useState(true);
+
   if (!isReady) {
-    return null; // O un componente de carga
+    return (
+      <CustomSplashScreen
+        onFinish={() => setShowSplash(false)}
+        duration={3000}
+        showProgress={true}
+        enableAnimations={true}
+      />
+    );
+  }
+
+  if (showSplash) {
+    return (
+      <CustomSplashScreen
+        onFinish={() => setShowSplash(false)}
+        duration={2000}
+        showProgress={false}
+        enableAnimations={true}
+      />
+    );
   }
   
   return <AppNavigator />;
