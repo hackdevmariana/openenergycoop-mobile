@@ -1,14 +1,29 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
+import { Screen } from 'react-native-screens';
 import { Card, Title, Paragraph, Button } from 'react-native-paper';
 import { Icon } from '../config/icons';
 import { useAppStore } from '../stores/appStore';
+import { useTheme } from '../hooks/useTheme';
+import { useScreens } from '../hooks/useScreens';
+import { usePostHogAnalytics } from '../hooks/usePostHogAnalytics';
+import { useNavigation } from '@react-navigation/native';
 
 const HomeScreen: React.FC = () => {
   const { currentTheme, setTheme } = useAppStore();
+  const { themedClasses } = useTheme();
+  const { trackUserAction } = usePostHogAnalytics();
+  const { createScreenOptions } = useScreens();
+  const navigation = useNavigation();
+
+  const handleNavigateToDetail = () => {
+    trackUserAction('navigate_to_detail', { from: 'HomeScreen' });
+    navigation.navigate('Detail' as never);
+  };
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <Screen style={{ flex: 1 }}>
+      <ScrollView className={themedClasses.container}>
       <View className="p-4">
         <Title className="text-2xl font-bold mb-4 text-center">
           Bienvenido a OpenEnergyCoop
@@ -56,30 +71,30 @@ const HomeScreen: React.FC = () => {
         </Card>
 
         {/* Tarjeta de acciones rápidas */}
-        <Card className="mb-4">
+        <Card className={themedClasses.card + ' mb-4'}>
           <Card.Content>
             <Title className="text-lg mb-3">Acciones Rápidas</Title>
             <View className="space-y-2">
               <Button 
                 mode="contained" 
                 onPress={() => console.log('Ver dashboard')}
-                className="mb-2"
+                className={themedClasses.btnPrimary + ' mb-2'}
               >
                 <Icon name="chart" size={20} color="#FFFFFF" />
                 <Text className="ml-2 text-white">Ver Dashboard</Text>
               </Button>
               <Button 
                 mode="outlined" 
-                onPress={() => console.log('Configurar energía')}
-                className="mb-2"
+                onPress={handleNavigateToDetail}
+                className={themedClasses.btnSecondary + ' mb-2'}
               >
-                <Icon name="settings" size={20} color="#007AFF" />
-                <Text className="ml-2 text-blue-500">Configurar Energía</Text>
+                <Icon name="arrowRight" size={20} color="#007AFF" />
+                <Text className="ml-2 text-blue-500">Probar Gestos</Text>
               </Button>
               <Button 
                 mode="outlined" 
                 onPress={() => setTheme(currentTheme === 'light' ? 'dark' : 'light')}
-                className="mb-2"
+                className={themedClasses.btnSecondary + ' mb-2'}
               >
                 <Icon name="gear" size={20} color="#007AFF" />
                 <Text className="ml-2 text-blue-500">Cambiar Tema</Text>
@@ -153,7 +168,8 @@ const HomeScreen: React.FC = () => {
           </Card.Content>
         </Card>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </Screen>
   );
 };
 

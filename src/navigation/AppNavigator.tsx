@@ -5,12 +5,15 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAppStore } from '../stores/appStore';
 import { Icon } from '../config/icons';
 import { RootStackParamList, MainTabParamList } from '../types/navigation';
+import { useScreens } from '../hooks/useScreens';
 
 // Importar pantallas
 import HomeScreen from '../screens/HomeScreen';
 import DashboardScreen from '../screens/DashboardScreen';
+import DetailScreen from '../screens/DetailScreen';
 import StorageDemo from '../components/StorageDemo';
 import IconShowcase from '../components/IconShowcase';
+import NavigationGesturesDemo from '../components/NavigationGesturesDemo';
 
 // Crear navegadores
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -19,6 +22,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 // Navegador de pestañas principales
 const MainTabNavigator: React.FC = () => {
   const { currentTheme } = useAppStore();
+  const { createScreenOptions } = useScreens();
 
   return (
     <Tab.Navigator
@@ -61,6 +65,12 @@ const MainTabNavigator: React.FC = () => {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        // Configuración de React Native Screens para gestos
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+        gestureResponseDistance: 50,
+        animation: 'slide_from_right',
+        presentation: 'card',
       })}
     >
       <Tab.Screen 
@@ -81,10 +91,10 @@ const MainTabNavigator: React.FC = () => {
       />
       <Tab.Screen 
         name="Energy" 
-        component={StorageDemo}
+        component={NavigationGesturesDemo}
         options={{
-          title: 'Energía',
-          tabBarLabel: 'Energía',
+          title: 'Gestos',
+          tabBarLabel: 'Gestos',
         }}
       />
       <Tab.Screen 
@@ -110,6 +120,7 @@ const MainTabNavigator: React.FC = () => {
 // Navegador principal
 const AppNavigator: React.FC = () => {
   const { isInitialized } = useAppStore();
+  const { createScreenOptions } = useScreens();
 
   if (!isInitialized) {
     // Pantalla de carga mientras se inicializa
@@ -121,6 +132,14 @@ const AppNavigator: React.FC = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
+          // Configuración de React Native Screens para gestos de navegación
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+          gestureResponseDistance: 50,
+          animation: 'slide_from_right',
+          presentation: 'card',
+          // Configuración de rendimiento
+          animationTypeForReplace: 'push',
         }}
       >
         <Stack.Screen 
@@ -128,6 +147,20 @@ const AppNavigator: React.FC = () => {
           component={MainTabNavigator}
           options={{
             headerShown: false,
+          }}
+        />
+        <Stack.Screen 
+          name="Detail" 
+          component={DetailScreen}
+          options={{
+            headerShown: true,
+            title: 'Detalle',
+            // Configuración específica para gestos en esta pantalla
+            gestureEnabled: true,
+            gestureDirection: 'horizontal',
+            gestureResponseDistance: 50,
+            animation: 'slide_from_right',
+            presentation: 'card',
           }}
         />
       </Stack.Navigator>

@@ -33,3 +33,28 @@ export const defaultTabRoutes: TabRoute[] = [
     },
   },
 ];
+
+// Tipos para las rutas del stack principal
+export type RootStackParamList = {
+  Main: undefined;
+  Detail: undefined;
+};
+
+// Tipos para las rutas de pestañas principales
+export type MainTabParamList = {
+  Home: undefined;
+  Dashboard: undefined;
+  Energy: undefined;
+  Profile: undefined;
+  Settings: undefined;
+};
+
+// Tipos para las rutas de pestañas por defecto
+export type TabRoute = {
+  name: string;
+  component: React.ComponentType<any>;
+  options: {
+    tabBarLabel: string;
+    tabBarIcon: (props: { focused: boolean; color: string; size: number }) => React.ReactElement;
+  };
+};
