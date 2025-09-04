@@ -1,28 +1,28 @@
 import { create } from 'zustand';
 import { storageService, STORAGE_KEYS } from '../services/storage';
-import { NavigationHistoryItem, NavigationMetrics, NavigationLoadingState } from '../types/navigation';
+import { ThemeMode } from '../config/theme';
 
 interface AppStore {
   // Estado básico
   isOnline: boolean;
   isInitialized: boolean;
-  currentTheme: 'light' | 'dark' | 'system';
+  themeMode: ThemeMode;
   language: string;
   notifications: any[];
   settings: any;
   isLoading: boolean;
 
   // Estado de navegación
-  navigationHistory: NavigationHistoryItem[];
+  navigationHistory: any[];
   currentRoute: string;
   previousRoute?: string;
-  navigationMetrics: NavigationMetrics;
-  navigationLoading: NavigationLoadingState;
+  navigationMetrics: any;
+  navigationLoading: any;
 
   // Acciones básicas
   setOnline: (online: boolean) => void;
   setInitialized: (initialized: boolean) => void;
-  setTheme: (theme: 'light' | 'dark' | 'system') => void;
+  setThemeMode: (themeMode: ThemeMode) => void;
   setLanguage: (language: string) => void;
   addNotification: (notification: any) => void;
   removeNotification: (id: string) => void;
@@ -31,14 +31,15 @@ interface AppStore {
   clearReadNotifications: () => void;
   updateSettings: (settings: any) => void;
   resetSettings: () => void;
-  setLoading: (loading: boolean) => void;
+  setLoading: (loading: boolean, message?: string) => void;
+  clearLoading: () => void;
 
   // Acciones de navegación
   addNavigationHistory: (routeName: string, params?: any) => void;
   clearNavigationHistory: () => void;
   setCurrentRoute: (route: string) => void;
   setPreviousRoute: (route: string) => void;
-  addNavigationMetric: (metric: Partial<NavigationMetrics>) => void;
+  addNavigationMetric: (metric: any) => void;
   setNavigationLoading: (loading: boolean, message?: string) => void;
   isRouteAccessible: (routeName: string) => boolean;
 
@@ -52,7 +53,7 @@ interface AppStore {
 const initialState = {
   isOnline: true,
   isInitialized: false,
-  currentTheme: 'system' as const,
+  themeMode: 'system' as ThemeMode,
   language: 'es',
   notifications: [],
   settings: {
@@ -61,6 +62,11 @@ const initialState = {
     enableAnalytics: false,
     autoRefresh: true,
     refreshInterval: 5,
+    themePreferences: {
+      autoSwitch: true,
+      animationDuration: 300,
+      preserveSystemPreference: true,
+    },
   },
   isLoading: false,
   navigationHistory: [],
@@ -92,9 +98,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ isInitialized: initialized });
   },
 
-  setTheme: (theme) => {
-    set({ currentTheme: theme });
-    storageService.setItem(STORAGE_KEYS.THEME_CONFIG, { mode: theme });
+  setThemeMode: (themeMode) => {
+    set({ themeMode });
+    storageService.setItem(STORAGE_KEYS.THEME_CONFIG, { mode: themeMode });
+    
+    if (__DEV__) {
+      console.log(`🌙 Tema actualizado en store: ${themeMode}`);
+    }
   },
 
   setLanguage: (language) => {
@@ -103,45 +113,57 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   addNotification: (notification) => {
-    const { notifications } = get();
-    const newNotifications = [notification, ...notifications];
-    set({ notifications: newNotifications });
-    storageService.setItem(STORAGE_KEYS.NOTIFICATIONS, newNotifications);
+    const newNotification = {
+      id: Date.now().toString(),
+      timestamp: new Date().toISOString(),
+      read: false,
+      ...notification,
+    };
+    
+    set((state) => ({
+      notifications: [newNotification, ...state.notifications],
+    }));
+    
+    storageService.setItem(STORAGE_KEYS.NOTIFICATIONS, get().notifications);
   },
 
   removeNotification: (id) => {
-    const { notifications } = get();
-    const filteredNotifications = notifications.filter(n => n.id !== id);
-    set({ notifications: filteredNotifications });
-    storageService.setItem(STORAGE_KEYS.NOTIFICATIONS, filteredNotifications);
+    set((state) => ({
+      notifications: state.notifications.filter((n) => n.id !== id),
+    }));
+    
+    storageService.setItem(STORAGE_KEYS.NOTIFICATIONS, get().notifications);
   },
 
   markNotificationAsRead: (id) => {
-    const { notifications } = get();
-    const updatedNotifications = notifications.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    );
-    set({ notifications: updatedNotifications });
-    storageService.setItem(STORAGE_KEYS.NOTIFICATIONS, updatedNotifications);
+    set((state) => ({
+      notifications: state.notifications.map((n) =>
+        n.id === id ? { ...n, read: true } : n
+      ),
+    }));
+    
+    storageService.setItem(STORAGE_KEYS.NOTIFICATIONS, get().notifications);
   },
 
   clearNotifications: () => {
     set({ notifications: [] });
-    storageService.removeItem(STORAGE_KEYS.NOTIFICATIONS);
+    storageService.setItem(STORAGE_KEYS.NOTIFICATIONS, []);
   },
 
   clearReadNotifications: () => {
-    const { notifications } = get();
-    const unreadNotifications = notifications.filter(n => !n.read);
-    set({ notifications: unreadNotifications });
-    storageService.setItem(STORAGE_KEYS.NOTIFICATIONS, unreadNotifications);
+    set((state) => ({
+      notifications: state.notifications.filter((n) => !n.read),
+    }));
+    
+    storageService.setItem(STORAGE_KEYS.NOTIFICATIONS, get().notifications);
   },
 
   updateSettings: (settings) => {
-    const currentSettings = get().settings;
-    const newSettings = { ...currentSettings, ...settings };
-    set({ settings: newSettings });
-    storageService.setItem(STORAGE_KEYS.APP_SETTINGS, newSettings);
+    set((state) => ({
+      settings: { ...state.settings, ...settings },
+    }));
+    
+    storageService.setItem(STORAGE_KEYS.APP_SETTINGS, get().settings);
   },
 
   resetSettings: () => {
@@ -149,47 +171,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
     storageService.setItem(STORAGE_KEYS.APP_SETTINGS, initialState.settings);
   },
 
-  setLoading: (loading) => {
-    set({ isLoading: loading });
-  },
-
-  // Acciones de navegación
-  addNavigationHistory: (routeName, params) => {
-    const { navigationHistory } = get();
-    const newHistoryItem: NavigationHistoryItem = {
-      routeName,
-      params,
-      timestamp: Date.now(),
-    };
-    
-    const updatedHistory = [newHistoryItem, ...navigationHistory].slice(0, 50); // Mantener solo los últimos 50
-    set({ navigationHistory: updatedHistory });
-  },
-
-  clearNavigationHistory: () => {
-    set({ navigationHistory: [] });
-  },
-
-  setCurrentRoute: (route) => {
-    const { currentRoute } = get();
+  setLoading: (loading, message) => {
     set({ 
-      currentRoute: route,
-      previousRoute: currentRoute,
-    });
-  },
-
-  setPreviousRoute: (route) => {
-    set({ previousRoute: route });
-  },
-
-  addNavigationMetric: (metric) => {
-    const { navigationMetrics } = get();
-    const updatedMetrics = { ...navigationMetrics, ...metric };
-    set({ navigationMetrics: updatedMetrics });
-  },
-
-  setNavigationLoading: (loading, message) => {
-    set({ 
+      isLoading: loading,
       navigationLoading: {
         isLoading: loading,
         loadingMessage: message,
@@ -198,11 +182,69 @@ export const useAppStore = create<AppStore>((set, get) => ({
     });
   },
 
+  clearLoading: () => {
+    set({ 
+      isLoading: false,
+      navigationLoading: {
+        isLoading: false,
+        loadingMessage: undefined,
+        loadingRoute: undefined,
+      }
+    });
+  },
+
+  // Acciones de navegación
+  addNavigationHistory: (routeName, params) => {
+    const historyItem = {
+      routeName,
+      params,
+      timestamp: new Date().toISOString(),
+    };
+    
+    set((state) => ({
+      navigationHistory: [historyItem, ...state.navigationHistory.slice(0, 49)], // Mantener solo los últimos 50
+    }));
+  },
+
+  clearNavigationHistory: () => {
+    set({ navigationHistory: [] });
+  },
+
+  setCurrentRoute: (route) => {
+    const currentState = get();
+    set({
+      currentRoute: route,
+      previousRoute: currentState.currentRoute,
+    });
+    
+    // Agregar a historial
+    get().addNavigationHistory(route);
+  },
+
+  setPreviousRoute: (route) => {
+    set({ previousRoute: route });
+  },
+
+  addNavigationMetric: (metric) => {
+    set((state) => ({
+      navigationMetrics: { ...state.navigationMetrics, ...metric },
+    }));
+  },
+
+  setNavigationLoading: (loading, message) => {
+    set({
+      navigationLoading: {
+        isLoading: loading,
+        loadingMessage: message,
+        loadingRoute: loading ? get().currentRoute : undefined,
+      },
+    });
+  },
+
   isRouteAccessible: (routeName) => {
-    // Aquí puedes implementar lógica de permisos
-    // Por ejemplo, verificar si el usuario está autenticado para ciertas rutas
-    const protectedRoutes = ['Profile', 'Settings', 'Energy', 'Dashboard'];
-    return !protectedRoutes.includes(routeName) || get().isOnline;
+    // Lógica básica de verificación de rutas
+    const accessibleRoutes = ['Home', 'Dashboard', 'Energy', 'Profile', 'Settings'];
+    return accessibleRoutes.includes(routeName);
   },
 
   // Acciones de persistencia
@@ -213,40 +255,61 @@ export const useAppStore = create<AppStore>((set, get) => ({
         themeConfig,
         language,
         notifications,
+        userProfile,
+        userPreferences,
         navigationHistory,
+        currentRoute,
+        navigationMetrics,
       ] = await Promise.all([
         storageService.getItem(STORAGE_KEYS.APP_SETTINGS),
         storageService.getItem(STORAGE_KEYS.THEME_CONFIG),
         storageService.getItem(STORAGE_KEYS.LANGUAGE),
         storageService.getItem(STORAGE_KEYS.NOTIFICATIONS),
+        storageService.getItem(STORAGE_KEYS.USER_PROFILE),
+        storageService.getItem(STORAGE_KEYS.USER_PREFERENCES),
         storageService.getItem(STORAGE_KEYS.NAVIGATION_HISTORY),
+        storageService.getItem(STORAGE_KEYS.CURRENT_ROUTE),
+        storageService.getItem(STORAGE_KEYS.NAVIGATION_METRICS),
       ]);
 
       set({
-        settings: appSettings || initialState.settings,
-        currentTheme: themeConfig?.mode || initialState.currentTheme,
-        language: language || initialState.language,
-        notifications: notifications || initialState.notifications,
-        navigationHistory: navigationHistory || initialState.navigationHistory,
+        isOnline: appSettings?.isOnline ?? initialState.isOnline,
+        settings: appSettings ?? initialState.settings,
+        themeMode: themeConfig?.mode ?? initialState.themeMode,
+        language: language ?? initialState.language,
+        notifications: notifications ?? initialState.notifications,
+        navigationHistory: navigationHistory ?? initialState.navigationHistory,
+        currentRoute: currentRoute ?? initialState.currentRoute,
+        navigationMetrics: navigationMetrics ?? initialState.navigationMetrics,
       });
+
+      if (__DEV__) {
+        console.log('📱 Estado de la aplicación cargado desde almacenamiento');
+      }
     } catch (error) {
-      console.error('Error loading from storage:', error);
+      console.error('Error cargando estado de la aplicación:', error);
     }
   },
 
   saveToStorage: async () => {
     try {
-      const { settings, currentTheme, language, notifications, navigationHistory } = get();
+      const state = get();
       
       await Promise.all([
-        storageService.setItem(STORAGE_KEYS.APP_SETTINGS, settings),
-        storageService.setItem(STORAGE_KEYS.THEME_CONFIG, { mode: currentTheme }),
-        storageService.setItem(STORAGE_KEYS.LANGUAGE, language),
-        storageService.setItem(STORAGE_KEYS.NOTIFICATIONS, notifications),
-        storageService.setItem(STORAGE_KEYS.NAVIGATION_HISTORY, navigationHistory),
+        storageService.setItem(STORAGE_KEYS.APP_SETTINGS, state.settings),
+        storageService.setItem(STORAGE_KEYS.THEME_CONFIG, { mode: state.themeMode }),
+        storageService.setItem(STORAGE_KEYS.LANGUAGE, state.language),
+        storageService.setItem(STORAGE_KEYS.NOTIFICATIONS, state.notifications),
+        storageService.setItem(STORAGE_KEYS.NAVIGATION_HISTORY, state.navigationHistory),
+        storageService.setItem(STORAGE_KEYS.CURRENT_ROUTE, state.currentRoute),
+        storageService.setItem(STORAGE_KEYS.NAVIGATION_METRICS, state.navigationMetrics),
       ]);
+
+      if (__DEV__) {
+        console.log('💾 Estado de la aplicación guardado en almacenamiento');
+      }
     } catch (error) {
-      console.error('Error saving to storage:', error);
+      console.error('Error guardando estado de la aplicación:', error);
     }
   },
 
@@ -254,19 +317,30 @@ export const useAppStore = create<AppStore>((set, get) => ({
     try {
       await storageService.clear();
       set(initialState);
+      
+      if (__DEV__) {
+        console.log('🗑️ Almacenamiento de la aplicación limpiado');
+      }
     } catch (error) {
-      console.error('Error clearing storage:', error);
+      console.error('Error limpiando almacenamiento:', error);
     }
   },
 
   saveNavigationState: async () => {
     try {
-      const { navigationHistory, currentRoute, navigationMetrics } = get();
-      await storageService.setItem(STORAGE_KEYS.NAVIGATION_HISTORY, navigationHistory);
-      await storageService.setItem(STORAGE_KEYS.CURRENT_ROUTE, currentRoute);
-      await storageService.setItem(STORAGE_KEYS.NAVIGATION_METRICS, navigationMetrics);
+      const state = get();
+      
+      await Promise.all([
+        storageService.setItem(STORAGE_KEYS.NAVIGATION_HISTORY, state.navigationHistory),
+        storageService.setItem(STORAGE_KEYS.CURRENT_ROUTE, state.currentRoute),
+        storageService.setItem(STORAGE_KEYS.NAVIGATION_METRICS, state.navigationMetrics),
+      ]);
+
+      if (__DEV__) {
+        console.log('🧭 Estado de navegación guardado');
+      }
     } catch (error) {
-      console.error('Error saving navigation state:', error);
+      console.error('Error guardando estado de navegación:', error);
     }
   },
 }));
