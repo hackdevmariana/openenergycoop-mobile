@@ -16,6 +16,7 @@ import IconShowcase from '../components/IconShowcase';
 import NavigationGesturesDemo from '../components/NavigationGesturesDemo';
 import HelpGesturesDemo from '../components/HelpGesturesDemo';
 import SVGDemo from '../components/SVGDemo';
+import MapsDemo from '../components/MapsDemo';
 
 // Crear navegadores
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -107,14 +108,14 @@ const MainTabNavigator: React.FC = () => {
           tabBarLabel: 'Ayuda',
         }}
       />
-      <Tab.Screen 
-        name="Settings" 
-        component={SVGDemo}
-        options={{
-          title: 'SVG',
-          tabBarLabel: 'SVG',
-        }}
-      />
+                  <Tab.Screen
+              name="Settings"
+              component={MapsDemo}
+              options={{
+                title: 'Maps',
+                tabBarLabel: 'Maps',
+              }}
+            />
     </Tab.Navigator>
   );
 };
