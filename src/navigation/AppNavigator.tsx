@@ -15,6 +15,7 @@ import StorageDemo from '../components/StorageDemo';
 import IconShowcase from '../components/IconShowcase';
 import NavigationGesturesDemo from '../components/NavigationGesturesDemo';
 import HelpGesturesDemo from '../components/HelpGesturesDemo';
+import SVGDemo from '../components/SVGDemo';
 
 // Crear navegadores
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -108,10 +109,10 @@ const MainTabNavigator: React.FC = () => {
       />
       <Tab.Screen 
         name="Settings" 
-        component={StorageDemo}
+        component={SVGDemo}
         options={{
-          title: 'Configuración',
-          tabBarLabel: 'Config',
+          title: 'SVG',
+          tabBarLabel: 'SVG',
         }}
       />
     </Tab.Navigator>
